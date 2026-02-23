@@ -24,6 +24,75 @@ Built with a Raspberry Pi Pico, DFPlayer Mini MP3 module, and a salvaged phone h
 
 See [SPEC.md](SPEC.md) for full wiring diagrams and BOM.
 
+## Wiring Diagram
+
+```mermaid
+graph TB
+    subgraph PICO["🟢 Raspberry Pi Pico"]
+        direction LR
+        GP0["GP0"]
+        GP1["GP1"]
+        GP2["GP2"]
+        GP3["GP3"]
+        GP4["GP4"]
+        GP5["GP5"]
+        GP6["GP6"]
+        GP7["GP7"]
+        GP8["GP8"]
+        GP9["GP9"]
+        VBUS["VBUS 5V"]
+        GND["GND"]
+    end
+
+    subgraph KEYPAD["⌨️ 3x4 Phone Keypad"]
+        COL0["Col 0<br/>1 4 7 *"]
+        COL1["Col 1<br/>2 5 8 0"]
+        COL2["Col 2<br/>3 6 9 #"]
+        ROW0["Row 0<br/>1 2 3"]
+        ROW1["Row 1<br/>4 5 6"]
+        ROW2["Row 2<br/>7 8 9"]
+        ROW3["Row 3<br/>* 0 #"]
+    end
+
+    subgraph DFPLAYER["🔊 DFPlayer Mini"]
+        DFP_RX["RX"]
+        DFP_TX["TX"]
+        DFP_VCC["VCC"]
+        DFP_GND["GND"]
+        DFP_SPK1["SPK1"]
+        DFP_SPK2["SPK2"]
+    end
+
+    subgraph HOOK["📞 Hook Switch"]
+        HOOK_SW["Switch"]
+        HOOK_GND["GND"]
+    end
+
+    subgraph EARPIECE["🔈 Phone Earpiece"]
+        EAR_P["+"]
+        EAR_N["-"]
+    end
+
+    GP0 --- COL0
+    GP1 --- COL1
+    GP2 --- COL2
+    GP6 --- ROW0
+    GP5 --- ROW1
+    GP4 --- ROW2
+    GP3 --- ROW3
+
+    GP8 -->|"1K Ω"| DFP_RX
+    GP9 --- DFP_TX
+    VBUS --- DFP_VCC
+    GND --- DFP_GND
+
+    GP7 --- HOOK_SW
+    HOOK_GND --- GND
+
+    DFP_SPK1 --- EAR_P
+    DFP_SPK2 --- EAR_N
+```
+
 ## GPIO Pinout
 
 | GPIO | Function | Direction |
@@ -38,6 +107,27 @@ See [SPEC.md](SPEC.md) for full wiring diagrams and BOM.
 | GP7  | Hook switch | Input (pull-up) |
 | GP8  | DFPlayer TX (via 1K resistor) | UART1 TX |
 | GP9  | DFPlayer RX | UART1 RX |
+
+## State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> IDLE
+    IDLE --> OFF_HOOK : Lift handset
+    OFF_HOOK --> DIALING : First digit
+    OFF_HOOK --> IDLE : Hang up
+    OFF_HOOK --> IDLE : 30s timeout
+    DIALING --> CONNECTING : 7 digits + 2s wait
+    DIALING --> CONNECTING : 10 digits
+    DIALING --> OFF_HOOK : Special code played
+    DIALING --> OFF_HOOK : * clear
+    DIALING --> IDLE : Hang up
+    CONNECTING --> PLAYING : Number found
+    CONNECTING --> OFF_HOOK : Not in service
+    CONNECTING --> IDLE : Hang up
+    PLAYING --> OFF_HOOK : Poem finished
+    PLAYING --> IDLE : Hang up
+```
 
 ## Dialing Logic
 
