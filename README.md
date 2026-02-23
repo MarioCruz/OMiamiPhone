@@ -179,11 +179,11 @@ Generate the sound effects:
 python3 -m venv venv
 source venv/bin/activate
 pip install numpy scipy gTTS
-python generate_tones.py
-python generate_411.py      # reads phonebook.json, generates 411 directory listing
+python tools/generate_tones.py
+python tools/generate_411.py      # reads phonebook.json, generates 411 directory listing
 ```
 
-Re-run `generate_411.py` whenever you update `phonebook.json` to keep the directory listing current.
+Re-run `tools/generate_411.py` whenever you update `phonebook.json` to keep the directory listing current.
 
 After copying to SD card on macOS: `dot_clean /Volumes/<SDCard>`
 
@@ -217,8 +217,6 @@ AUDIO_ENABLED = False   # Skip DFPlayer (prints debug to console)
 | `config.py` | `:config.py` | All settings (pins, timing, volume) |
 | `dfplayer.py` | `:dfplayer.py` | DFPlayer Mini library |
 | `phonebook.json` | `:phonebook.json` | Phone number → poem mappings |
-| `generate_tones.py` | No | Generates sound effects (run on desktop) |
-| `generate_411.py` | No | Generates 411 directory listing from phonebook.json |
 | `SPEC.md` | No | Full hardware/software specification |
+| `tools/` | No | Desktop scripts (tone generators, keypad discovery, etc.) |
 | `hardware_test/` | No | Hardware validation (DFPlayer, hook switch) |
-| `utils/` | No | Keypad discovery tools from initial build |

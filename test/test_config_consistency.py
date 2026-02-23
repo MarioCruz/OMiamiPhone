@@ -38,7 +38,7 @@ def load_phonebook():
 
 def load_generate_tones_constants():
     """Parse DTMF_FILE_MAP from generate_tones.py."""
-    gt_path = os.path.join(PROJECT_ROOT, "generate_tones.py")
+    gt_path = os.path.join(PROJECT_ROOT, "tools", "generate_tones.py")
     with open(gt_path) as f:
         source = f.read()
 
@@ -171,7 +171,7 @@ class TestPhonebook:
 
 class TestGenerateTonesConsistency:
     def test_generate_tones_exists(self):
-        assert os.path.exists(os.path.join(PROJECT_ROOT, "generate_tones.py"))
+        assert os.path.exists(os.path.join(PROJECT_ROOT, "tools", "generate_tones.py"))
 
     def test_dtmf_map_matches_config(self):
         """DTMF file numbers in generate_tones.py must match config.py."""
