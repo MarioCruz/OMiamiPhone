@@ -206,5 +206,5 @@ AUDIO_ENABLED = False   # Skip DFPlayer (prints debug to console)
 | `phonebook.json` | `:phonebook.json` | Phone number → poem mappings |
 | `generate_tones.py` | No | Generates sound effects (run on desktop) |
 | `SPEC.md` | No | Full hardware/software specification |
-| `tests/` | No | Hardware validation (DFPlayer, hook switch) |
+| `hardware_test/` | No | Hardware validation (DFPlayer, hook switch) |
 | `utils/` | No | Keypad discovery tools from initial build |

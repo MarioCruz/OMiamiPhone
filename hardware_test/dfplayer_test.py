@@ -16,7 +16,7 @@ Wiring:
 
 Usage:
   mpremote connect /dev/cu.usbmodem1101 cp dfplayer.py :dfplayer.py
-  mpremote connect /dev/cu.usbmodem1101 run tests/dfplayer_test.py
+  mpremote connect /dev/cu.usbmodem1101 run hardware_test/dfplayer_test.py
 """
 
 from machine import Pin

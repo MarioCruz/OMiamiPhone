@@ -17,7 +17,7 @@ If your switch is normally-open, the values will be inverted.
 The script will tell you which type you have.
 
 Usage:
-  mpremote connect /dev/cu.usbmodem1101 run tests/hook_test.py
+  mpremote connect /dev/cu.usbmodem1101 run hardware_test/hook_test.py
 """
 
 from machine import Pin
