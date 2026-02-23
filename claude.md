@@ -43,12 +43,11 @@ Only 4 files deployed: `config.py`, `dfplayer.py`, `main.py` (from poetry_phone.
 | `config.py` | `:config.py` | All settings (pins, timing, volume, special codes) |
 | `dfplayer.py` | `:dfplayer.py` | DFPlayer Mini library (redoxcode) |
 | `phonebook.json` | `:phonebook.json` | Phone number → poem mappings (4 entries) |
-| `generate_tones.py` | No | Desktop script to generate sound effects |
+| `tools/` | No | Desktop scripts (generators, keypad discovery, etc.) |
 | `SPEC.md` | No | Full hardware/software specification |
 | `SHOPPING.md` | No | Shopping list (extracted from SPEC.md) |
-| `test/` | No | 143 pytest tests with MicroPython mock framework |
+| `test/` | No | 144 pytest tests with MicroPython mock framework |
 | `hardware_test/` | No | Hardware validation scripts (dfplayer_test.py, hook_test.py) |
-| `utils/` | No | Keypad discovery tools from initial build |
 
 ## Test Suite
 
