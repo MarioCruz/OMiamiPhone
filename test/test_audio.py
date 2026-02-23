@@ -142,8 +142,8 @@ class TestAudioSequences:
         poem_idx = next(i for i, e in enumerate(phone.audio_log) if e[0] == "poem")
         assert ringback_idx < poem_idx
 
-    def test_failed_call_audio_sequence(self):
-        """Lift → dial unknown → not_in_service → busy → dial tone."""
+    def test_unknown_call_audio_sequence(self):
+        """Lift → dial unknown → ringback → random poem."""
         phone = PhoneSimulator(phonebook=PHONEBOOK)
         phone.lift_handset()
         phone.dial_number("9999999")
@@ -151,9 +151,13 @@ class TestAudioSequences:
         phone.process_number()
 
         sfx_nums = [e[1] for e in phone.audio_log if e[0] == "sfx"]
-        assert phone.SFX_NOT_IN_SERVICE in sfx_nums
-        assert phone.SFX_BUSY in sfx_nums
-        assert phone.SFX_DIALTONE in sfx_nums
+        assert phone.SFX_RINGBACK in sfx_nums
+        random_plays = [e for e in phone.audio_log if e[0] == "random"]
+        assert len(random_plays) == 1
+        # Ringback before random poem
+        ringback_idx = next(i for i, e in enumerate(phone.audio_log) if e == ("sfx", phone.SFX_RINGBACK))
+        random_idx = next(i for i, e in enumerate(phone.audio_log) if e[0] == "random")
+        assert ringback_idx < random_idx
 
     def test_poem_finish_audio_sequence(self):
         """Poem ends → hangup click → dial tone."""

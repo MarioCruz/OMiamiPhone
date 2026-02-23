@@ -1,6 +1,7 @@
 from machine import Pin
 import utime
 import json
+import random
 import config
 
 # =============================================================================
@@ -164,6 +165,16 @@ def play_poem(file_num):
         utime.sleep_ms(50)
     else:
         print("  ~~ [POEM:{}]".format(file_num))
+
+
+def play_random_poem():
+    """Play a random poem from /03/."""
+    file_num = random.randint(1, config.RANDOM_COUNT)
+    if HAS_AUDIO:
+        df.play(config.RANDOM_FOLDER, file_num)
+        utime.sleep_ms(50)
+    else:
+        print("  ~~ [RANDOM:{}]".format(file_num))
 
 
 def stop_audio():
@@ -419,23 +430,18 @@ while True:
             play_poem(poem_file)
             state = STATE_PLAYING
         else:
-            print(">>> {} - Number not in service.".format(format_number(number)))
-            play_sfx(config.SFX_NOT_IN_SERVICE)
-            hung_up = wait_with_hangup_check(config.BUSY_DURATION)
+            print(">>> {} - Random poem.".format(format_number(number)))
+            play_sfx(config.SFX_RINGBACK)
+            hung_up = wait_with_hangup_check(config.RING_DURATION)
             if hung_up:
                 stop_audio()
                 state = STATE_IDLE
                 number = ""
                 continue
             stop_audio()
-            # Play busy signal
-            play_sfx(config.SFX_BUSY)
-            wait_with_hangup_check(config.BUSY_DURATION)
-            stop_audio()
-            # Back to dial tone
-            number = ""
-            start_dialtone()
-            state = STATE_OFF_HOOK
+            utime.sleep_ms(200)
+            play_random_poem()
+            state = STATE_PLAYING
 
     # ----- PLAYING: poem is playing -----
     elif state == STATE_PLAYING:

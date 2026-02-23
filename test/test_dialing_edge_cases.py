@@ -133,11 +133,12 @@ class TestAreaCodeStripping:
         assert result[0] == "playing"
         assert result[1] == "Jenny"
 
-    def test_unknown_10_digit_not_in_service(self, phone):
+    def test_unknown_10_digit_plays_random(self, phone):
         phone.lift_handset()
         phone.dial_number("2129999999")
         result = phone.process_number()
-        assert result[0] == "not_in_service"
+        assert result[0] == "random"
+        assert phone.state == phone.STATE_PLAYING
 
 
 # =============================================================================
@@ -271,14 +272,21 @@ class TestFullCallFlow:
         assert result[0] == "playing"
         assert result[1] == "Directory Blues"
 
-    def test_wrong_number_then_correct(self, phone):
-        """Dial wrong number, get busy, then dial correct one."""
+    def test_wrong_number_plays_random(self, phone):
+        """Dial wrong number, get random poem."""
         phone.lift_handset()
         phone.dial_number("9999999")
         result = phone.process_number()
-        assert result[0] == "not_in_service"
-        assert phone.state == phone.STATE_OFF_HOOK
-        # Now dial the right number
+        assert result[0] == "random"
+        assert phone.state == phone.STATE_PLAYING
+
+    def test_wrong_number_then_hangup_redial(self, phone):
+        """Dial wrong number, hear random poem, hang up, dial correct one."""
+        phone.lift_handset()
+        phone.dial_number("9999999")
+        phone.process_number()
+        phone.hangup()
+        phone.lift_handset()
         phone.dial_number("8675309")
         result = phone.process_number()
         assert result[0] == "playing"

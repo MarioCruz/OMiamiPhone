@@ -6,8 +6,8 @@
 # =============================================================================
 
 # --- Hardware Flags ---
-HOOK_ENABLED = True       # False = skip hook switch (always acts off-hook)
-AUDIO_ENABLED = True      # False = skip DFPlayer (prints debug instead)
+HOOK_ENABLED = False      # False = skip hook switch (always acts off-hook)
+AUDIO_ENABLED = False     # False = skip DFPlayer (prints debug instead)
 
 # --- Hook Switch ---
 HOOK_PIN = 7              # GPIO pin for hook switch
@@ -32,7 +32,9 @@ KEYMAP = [
 
 # --- SD Card Folders ---
 SFX_FOLDER = 1            # Folder 01 on SD card = sound effects
-POEM_FOLDER = 2           # Folder 02 on SD card = poems
+POEM_FOLDER = 2           # Folder 02 on SD card = poems (mapped by number)
+RANDOM_FOLDER = 3         # Folder 03 on SD card = random poems (unknown numbers)
+RANDOM_COUNT = 1          # How many files in /03/ (update as you add more)
 
 # --- Sound Effect File Numbers (in /01/) ---
 SFX_DIALTONE       = 1

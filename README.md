@@ -160,11 +160,19 @@ sd_card/
 │   ├── 020_411.mp3
 │   └── 021_305_omiami.mp3
 │
-└── 02/                        ← Poems
-    ├── 001_8675309.mp3
-    ├── 002_5551212.mp3
-    └── ...
+├── 02/                        ← Poems (mapped to phone numbers)
+│   ├── 001_8675309.mp3
+│   ├── 002_5551212.mp3
+│   └── ...
+│
+└── 03/                        ← Random poems (unknown numbers)
+    ├── 001_not_in_service.mp3
+    ├── 002_wrong_number.mp3
+    ├── 003_lost_call.mp3
+    └── ...                    ← Add as many as you like!
 ```
+
+Unknown numbers play a random poem from `/03/`. Update `RANDOM_COUNT` in `config.py` to match the number of files in this folder.
 
 Generate the sound effects:
 ```bash

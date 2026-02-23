@@ -155,12 +155,12 @@ class TestConnectingState:
         assert result[1] == "Jenny"
         assert phone.state == phone.STATE_PLAYING
 
-    def test_unknown_number_not_in_service(self, phone):
+    def test_unknown_number_plays_random(self, phone):
         phone.lift_handset()
         phone.dial_number("9999999")
         result = phone.process_number()
-        assert result[0] == "not_in_service"
-        assert phone.state == phone.STATE_OFF_HOOK
+        assert result[0] == "random"
+        assert phone.state == phone.STATE_PLAYING
 
     def test_ten_digit_strips_area_code(self, phone):
         phone.lift_handset()
@@ -170,11 +170,12 @@ class TestConnectingState:
         assert result[0] == "playing"
         assert result[1] == "Jenny"
 
-    def test_unknown_ten_digit_not_in_service(self, phone):
+    def test_unknown_ten_digit_plays_random(self, phone):
         phone.lift_handset()
         phone.dial_number("3059999999")
         result = phone.process_number()
-        assert result[0] == "not_in_service"
+        assert result[0] == "random"
+        assert phone.state == phone.STATE_PLAYING
 
     def test_ringback_played_for_known_number(self, phone):
         phone.lift_handset()
@@ -184,21 +185,22 @@ class TestConnectingState:
         sfx_plays = [e for e in phone.audio_log if e[0] == "sfx"]
         assert ("sfx", phone.SFX_RINGBACK) in sfx_plays
 
-    def test_not_in_service_played_for_unknown(self, phone):
+    def test_ringback_played_for_unknown(self, phone):
         phone.lift_handset()
         phone.dial_number("9999999")
         phone.audio_log.clear()
         phone.process_number()
         sfx_plays = [e for e in phone.audio_log if e[0] == "sfx"]
-        assert ("sfx", phone.SFX_NOT_IN_SERVICE) in sfx_plays
+        assert ("sfx", phone.SFX_RINGBACK) in sfx_plays
 
-    def test_busy_signal_after_not_in_service(self, phone):
+    def test_random_poem_played_for_unknown(self, phone):
         phone.lift_handset()
         phone.dial_number("9999999")
         phone.audio_log.clear()
         phone.process_number()
-        sfx_plays = [e for e in phone.audio_log if e[0] == "sfx"]
-        assert ("sfx", phone.SFX_BUSY) in sfx_plays
+        random_plays = [e for e in phone.audio_log if e[0] == "random"]
+        assert len(random_plays) == 1
+        assert 1 <= random_plays[0][1] <= phone.RANDOM_COUNT
 
 
 # =============================================================================

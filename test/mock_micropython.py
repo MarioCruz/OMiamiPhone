@@ -6,6 +6,7 @@ so we can test poetry_phone logic without hardware.
 """
 
 import time as _time
+import random as _random
 
 
 # =============================================================================
@@ -204,6 +205,10 @@ class PhoneSimulator:
             "611": 17, "711": 17, "811": 17, "911": 17, "305": 21,
         }
 
+        # Random poems
+        self.RANDOM_FOLDER = 3
+        self.RANDOM_COUNT = 5  # default for tests
+
         # Timing (ms)
         self.DIALTONE_TIMEOUT = 30000
         self.SEVEN_DIGIT_WAIT = 2000
@@ -249,6 +254,11 @@ class PhoneSimulator:
     def play_poem(self, file_num):
         self.dfplayer.play(2, file_num)
         self.audio_log.append(("poem", file_num))
+
+    def play_random_poem(self):
+        file_num = _random.randint(1, self.RANDOM_COUNT)
+        self.dfplayer.play(self.RANDOM_FOLDER, file_num)
+        self.audio_log.append(("random", file_num))
 
     def stop_audio(self):
         self.dfplayer.stop()
@@ -321,14 +331,11 @@ class PhoneSimulator:
             self.state = self.STATE_PLAYING
             return ("playing", self.phonebook[self.number]["title"])
         else:
-            self.play_sfx(self.SFX_NOT_IN_SERVICE)
+            self.play_sfx(self.SFX_RINGBACK)
             self.stop_audio()
-            self.play_sfx(self.SFX_BUSY)
-            self.stop_audio()
-            self.number = ""
-            self.start_dialtone()
-            self.state = self.STATE_OFF_HOOK
-            return ("not_in_service", self.number)
+            self.play_random_poem()
+            self.state = self.STATE_PLAYING
+            return ("random", self.number)
 
     def check_operator(self):
         """Check if current number triggers operator (single 0)."""
