@@ -9,7 +9,7 @@ Built with a Raspberry Pi Pico, DFPlayer Mini MP3 module, and a salvaged phone h
 1. Lift the handset — hear a dial tone
 2. Dial a 7-digit number — hear DTMF touch tones
 3. If the number is in the phonebook — hear ringing, then the poem plays
-4. If not — "number not in service" message, then busy signal
+4. If not — hear ringing, then a random poem plays
 5. Hang up at any time to reset
 
 ## Hardware
@@ -123,7 +123,7 @@ stateDiagram-v2
     DIALING --> OFF_HOOK : * clear
     DIALING --> IDLE : Hang up
     CONNECTING --> PLAYING : Number found
-    CONNECTING --> OFF_HOOK : Not in service
+    CONNECTING --> PLAYING : Random poem
     CONNECTING --> IDLE : Hang up
     PLAYING --> OFF_HOOK : Poem finished
     PLAYING --> IDLE : Hang up
@@ -220,3 +220,5 @@ AUDIO_ENABLED = False   # Skip DFPlayer (prints debug to console)
 | `SPEC.md` | No | Full hardware/software specification |
 | `tools/` | No | Desktop scripts (tone generators, keypad discovery, etc.) |
 | `hardware_test/` | No | Hardware validation (DFPlayer, hook switch) |
+| `test/` | No | 144 pytest tests with MicroPython mock framework |
+| `USER_GUIDE.md` | No | How to add/remove poems and manage the SD card |
