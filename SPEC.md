@@ -39,12 +39,13 @@ The existing PhoneHack project proved that a 3x4 membrane keypad works with a Pi
 
 | GPIO | New Use | Direction | Notes |
 |------|---------|-----------|-------|
-| GP7 | **Hook switch** | Input (pull-up) | HIGH = off-hook, LOW = on-hook |
-| GP8 | **DFPlayer UART1 TX** | Output | Via 1K resistor to DFPlayer RX |
-| GP9 | **DFPlayer UART1 RX** | Input | Direct from DFPlayer TX |
-| GP10 | **DFPlayer BUSY pin** | Input | Optional — LOW = playing, HIGH = idle |
+| GP20 | **DFPlayer UART1 TX** | Output | Via 1K resistor to DFPlayer RX |
+| GP21 | **DFPlayer UART1 RX** | Input | Direct from DFPlayer TX |
+| GP22 | **Hook switch** | Input (pull-up) | HIGH = off-hook, LOW = on-hook |
 
-### Available (GP11–GP28)
+**Note:** UART1 TX/RX are constrained to specific pins on the RP2040. GP20/GP21 are the UART1 pair in the GP20+ range. GP23-25 are internal (SMPS, VBUS sense, onboard LED).
+
+### Available (GP7–GP19, GP26–GP28)
 
 All remaining GPIOs are free for future expansion (LEDs, rotary dial, coin slot, etc.).
 
@@ -55,8 +56,8 @@ All remaining GPIOs are free for future expansion (LEDs, rotary dial, coin slot,
 ```
 Pico                              DFPlayer Mini
 ====                              =============
-GP8 (TX) ---[1K resistor]------> RX
-GP9 (RX) <---------------------- TX
+GP20 (TX) ---[1K resistor]-----> RX
+GP21 (RX) <--------------------- TX
 VBUS (5V) ----------------------> VCC
 GND -----------------------------> GND
                                   SPK1 ----> Phone earpiece (+)
@@ -64,12 +65,12 @@ GND -----------------------------> GND
 
 Hook Switch (in phone cradle)
 =============================
-GP7 ----+---- Hook Switch ---- GND
+GP22 ---+---- Hook Switch ---- GND
         |
    (internal pull-up)
 
-Handset DOWN (on-hook): switch closed, GP7 = LOW
-Handset UP (off-hook):  switch open,   GP7 = HIGH
+Handset DOWN (on-hook): switch closed, GP22 = LOW
+Handset UP (off-hook):  switch open,   GP22 = HIGH
 ```
 
 ---
@@ -234,7 +235,7 @@ Key API:
 ```python
 from dfplayer import DFPlayer
 
-df = DFPlayer(uart_id=1, tx_pin_id=8, rx_pin_id=9)
+df = DFPlayer(uart_id=1, tx_pin_id=20, rx_pin_id=21)
 df.volume(20)                    # 0-30
 df.play(folder=1, file=1)       # Play /01/001.mp3
 df.stop()                        # Stop playback
@@ -270,14 +271,14 @@ mpremote connect /dev/cu.usbmodem1101 cp phone.py :main.py
 ## 12. Implementation Phases
 
 ### Phase 1: Hardware Validation
-1. Wire DFPlayer to Pico (GP8 TX, GP9 RX, VBUS 5V, GND)
+1. Wire DFPlayer to Pico (GP20 TX, GP21 RX, VBUS 5V, GND)
 2. Connect phone earpiece to SPK1/SPK2
 3. Load a test MP3 onto SD card as `/01/001.mp3`
 4. Write a minimal test script to verify sound in earpiece
 5. Tune volume for comfortable earpiece listening
 
 ### Phase 2: Hook Switch
-1. Wire hook switch to GP7 + GND
+1. Wire hook switch to GP22 + GND
 2. Test NC/NO behavior with multimeter
 3. Write test script printing on-hook/off-hook state changes
 4. Verify debounce (no false triggers)

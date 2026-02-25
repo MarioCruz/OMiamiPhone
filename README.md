@@ -37,9 +37,9 @@ graph TB
         GP4["GP4"]
         GP5["GP5"]
         GP6["GP6"]
-        GP7["GP7"]
-        GP8["GP8"]
-        GP9["GP9"]
+        GP20["GP20"]
+        GP21["GP21"]
+        GP22["GP22"]
         VBUS["VBUS 5V"]
         GND["GND"]
     end
@@ -81,12 +81,12 @@ graph TB
     GP4 --- ROW2
     GP3 --- ROW3
 
-    GP8 -->|"1K Ω"| DFP_RX
-    GP9 --- DFP_TX
+    GP20 -->|"1K Ω"| DFP_RX
+    GP21 --- DFP_TX
     VBUS --- DFP_VCC
     GND --- DFP_GND
 
-    GP7 --- HOOK_SW
+    GP22 --- HOOK_SW
     HOOK_GND --- GND
 
     DFP_SPK1 --- EAR_P
@@ -104,9 +104,9 @@ graph TB
 | GP4  | Keypad row 2 (7, 8, 9) | Input (pull-up) |
 | GP5  | Keypad row 1 (4, 5, 6) | Input (pull-up) |
 | GP6  | Keypad row 0 (1, 2, 3) | Input (pull-up) |
-| GP7  | Hook switch | Input (pull-up) |
-| GP8  | DFPlayer TX (via 1K resistor) | UART1 TX |
-| GP9  | DFPlayer RX | UART1 RX |
+| GP20 | DFPlayer TX (via 1K resistor) | UART1 TX |
+| GP21 | DFPlayer RX | UART1 RX |
+| GP22 | Hook switch | Input (pull-up) |
 
 ## State Machine
 

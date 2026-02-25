@@ -265,6 +265,6 @@ If the port is busy, unplug and replug the Pico's USB cable.
 | Wrong poem plays | Check that the `file` number in phonebook.json matches the 3-digit prefix on the SD card |
 | Bottom row keys (*, 0, #) act weird | This is normal — they need extra debounce. The code handles it. If it's really bad, check the keypad wiring. |
 | "mpremote: failed to access" | Close Thonny or any other serial monitor. If still stuck, unplug/replug the Pico. |
-| DFPlayer not responding | Check wiring: TX→RX (via 1K resistor), RX←TX. Make sure it's getting 5V from VBUS, not 3.3V. |
+| DFPlayer not responding | Check wiring: GP20 TX→RX (via 1K resistor), GP21 RX←TX. Make sure it's getting 5V from VBUS, not 3.3V. |
 | Poems sound too quiet/loud | Adjust `VOLUME` in config.py (0-30). 20 is a good starting point. |
 | SD card not reading | Must be FAT32, ≤32GB. On Mac, run `dot_clean` after copying files. |

@@ -2,14 +2,14 @@
 DFPlayer Mini hardware test — run on the Pico.
 
 Tests:
-  1. Initialize DFPlayer on UART1 (GP8 TX, GP9 RX)
+  1. Initialize DFPlayer on UART1 (GP20 TX, GP21 RX)
   2. Set volume
   3. Play a test file from /01/001.mp3 (dial tone)
   4. Wait, then stop
 
 Wiring:
-  GP8 --[1K resistor]--> DFPlayer RX
-  GP9 <----------------- DFPlayer TX
+  GP20 --[1K resistor]--> DFPlayer RX
+  GP21 <------------------ DFPlayer TX
   VBUS (5V) -----------> DFPlayer VCC
   GND ------------------> DFPlayer GND
   SPK1/SPK2 ------------> Phone earpiece
@@ -33,8 +33,8 @@ except ImportError:
 print("=== DFPlayer Mini Test ===\n")
 
 # Initialize DFPlayer on UART1
-print("Initializing DFPlayer on UART1 (TX=GP8, RX=GP9)...")
-df = DFPlayer(uart_id=1, tx_pin_id=8, rx_pin_id=9)
+print("Initializing DFPlayer on UART1 (TX=GP20, RX=GP21)...")
+df = DFPlayer(uart_id=1, tx_pin_id=20, rx_pin_id=21)
 utime.sleep_ms(1000)  # DFPlayer needs ~500ms to boot
 print("  OK\n")
 

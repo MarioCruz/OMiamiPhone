@@ -213,11 +213,11 @@ class TestPinAssignments:
         for pin in all_keypad:
             assert 0 <= pin <= 6, f"Keypad pin GP{pin} outside expected range"
 
-    def test_hook_pin_is_gp7(self):
+    def test_hook_pin_is_gp22(self):
         cfg = load_config_values()
-        assert cfg["HOOK_PIN"] == 7
+        assert cfg["HOOK_PIN"] == 22
 
-    def test_dfplayer_pins_are_gp8_gp9(self):
+    def test_dfplayer_pins_are_gp20_gp21(self):
         cfg = load_config_values()
-        assert cfg["DFPLAYER_TX"] == 8
-        assert cfg["DFPLAYER_RX"] == 9
+        assert cfg["DFPLAYER_TX"] == 20
+        assert cfg["DFPLAYER_RX"] == 21

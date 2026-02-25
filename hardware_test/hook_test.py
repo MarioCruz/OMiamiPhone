@@ -5,13 +5,13 @@ Detects when the phone handset is lifted (off-hook) or replaced (on-hook).
 Use this to verify your hook switch wiring and determine NC vs NO behavior.
 
 Wiring:
-  GP7 ----+---- Hook Switch ---- GND
+  GP22 ----+---- Hook Switch ---- GND
           |
      (internal pull-up enabled)
 
 Expected (normally-closed switch with pull-up):
-  Handset DOWN (on-hook):  switch closed -> GP7 = LOW  (0)
-  Handset UP   (off-hook): switch open   -> GP7 = HIGH (1)
+  Handset DOWN (on-hook):  switch closed -> GP22 = LOW  (0)
+  Handset UP   (off-hook): switch open   -> GP22 = HIGH (1)
 
 If your switch is normally-open, the values will be inverted.
 The script will tell you which type you have.
@@ -23,7 +23,7 @@ Usage:
 from machine import Pin
 import utime
 
-HOOK_PIN = 7
+HOOK_PIN = 22
 
 hook = Pin(HOOK_PIN, Pin.IN, Pin.PULL_UP)
 
