@@ -46,6 +46,7 @@ Only 4 files deployed: `config.py`, `dfplayer.py`, `main.py` (from poetry_phone.
 | `tools/` | No | Desktop scripts (generators, keypad discovery, etc.) |
 | `SPEC.md` | No | Full hardware/software specification |
 | `SHOPPING.md` | No | Shopping list (extracted from SPEC.md) |
+| `USER_GUIDE.md` | No | How to add/remove poems and manage the SD card |
 | `test/` | No | 144 pytest tests with MicroPython mock framework |
 | `hardware_test/` | No | Hardware validation scripts (dfplayer_test.py, hook_test.py) |
 
@@ -53,7 +54,7 @@ Only 4 files deployed: `config.py`, `dfplayer.py`, `main.py` (from poetry_phone.
 
 Run tests: `pytest test/ -v`
 
-143 tests across 5 test files. Mock framework in `test/mock_micropython.py` uses AST parser to avoid MicroPython imports.
+144 tests across 5 test files. Mock framework in `test/mock_micropython.py` uses AST parser to avoid MicroPython imports.
 
 ## Keypad Wiring
 
@@ -66,7 +67,7 @@ Run tests: `pytest test/ -v`
 
 - Library: redoxcode/micropython-dfplayer (single file `dfplayer.py`)
 - `is_playing()` returns file number (not bool) — check `== 0` for stopped, `-1` for error
-- UART1: TX on GP8 (via 1K resistor), RX on GP9
+- UART1: TX on GP20 (via 1K resistor), RX on GP21
 - Built-in amp drives 8-ohm phone earpiece directly
 - SD card must be FAT32, ≤32GB
 - File naming: DFPlayer reads 3-digit prefix, ignores the rest (e.g., `001_dialtone.mp3`)
@@ -77,7 +78,7 @@ Run tests: `pytest test/ -v`
 - Keypad: wired and working (GP0-GP6)
 - DFPlayer: code ready, not yet physically wired
 - Hook switch: code ready, not yet physically wired
-- SD card: file structure defined, generate with `python generate_tones.py`
+- SD card: file structure defined, generate with `python tools/generate_tones.py`
 
 ## Keypad Discovery (Historical)
 

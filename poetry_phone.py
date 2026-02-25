@@ -19,6 +19,9 @@ for c in cols:
 # --- Hook switch ---
 hook_pin = Pin(config.HOOK_PIN, Pin.IN, Pin.PULL_UP)
 
+# --- DFPlayer BUSY pin (LOW = playing, HIGH = idle) ---
+busy_pin = Pin(config.DFPLAYER_BUSY, Pin.IN, Pin.PULL_UP)
+
 # --- DFPlayer Mini (optional — runs without it for testing) ---
 HAS_AUDIO = False
 df = None
@@ -104,14 +107,14 @@ def get_key_timeout(timeout_ms):
 
 def wait_release():
     clean = 0
-    while clean < 10:
+    while clean < 5:
         hit = raw_scan()
         if hit is None:
             clean += 1
         else:
             clean = 0
-        utime.sleep_ms(10)
-    utime.sleep_ms(100)
+        utime.sleep_ms(5)
+    utime.sleep_ms(30)
 
 
 # =============================================================================
@@ -230,6 +233,7 @@ STATE_PLAYING    = 4
 state = STATE_IDLE
 number = ""
 dialtone_start = 0
+play_start = 0
 
 print("=== Poetry Phone ===")
 print("Waiting for handset lift...\n")
@@ -331,11 +335,8 @@ while True:
                 # Operator
                 stop_audio()
                 play_sfx(config.SPECIAL_CODES["0"])
-                wait_with_hangup_check(config.BUSY_DURATION)
-                stop_audio()
-                number = ""
-                start_dialtone()
-                state = STATE_OFF_HOOK
+                play_start = utime.ticks_ms()
+                state = STATE_PLAYING
             else:
                 play_dtmf(next_key)
                 wait_release()
@@ -387,11 +388,8 @@ while True:
             if next_key is None:
                 stop_audio()
                 play_sfx(config.SPECIAL_CODES[number])
-                wait_with_hangup_check(config.BUSY_DURATION)
-                stop_audio()
-                number = ""
-                start_dialtone()
-                state = STATE_OFF_HOOK
+                play_start = utime.ticks_ms()
+                state = STATE_PLAYING
             else:
                 play_dtmf(next_key)
                 wait_release()
@@ -428,6 +426,7 @@ while True:
             poem_file = PHONEBOOK[number]["file"]
             print('    Playing: "{}"'.format(PHONEBOOK[number]["title"]))
             play_poem(poem_file)
+            play_start = utime.ticks_ms()
             state = STATE_PLAYING
         else:
             print(">>> {} - Random poem.".format(format_number(number)))
@@ -441,9 +440,10 @@ while True:
             stop_audio()
             utime.sleep_ms(200)
             play_random_poem()
+            play_start = utime.ticks_ms()
             state = STATE_PLAYING
 
-    # ----- PLAYING: poem is playing -----
+    # ----- PLAYING: poem/sfx is playing -----
     elif state == STATE_PLAYING:
         if check_hangup():
             stop_audio()
@@ -452,23 +452,35 @@ while True:
             number = ""
             continue
 
-        # Check if poem finished (is_playing returns file number or -1)
-        if HAS_AUDIO:
-            try:
-                playing = df.is_playing()
-            except:
-                playing = 1  # Assume still playing if query fails
-        else:
-            playing = 0  # No audio = poem "finishes" immediately
-
-        if playing == 0:
-            print("[poem finished]")
-            # Play hangup click, then back to dial tone
-            play_sfx(config.SFX_HANGUP)
-            utime.sleep_ms(500)
+        # Safety timeout (5 minutes)
+        if utime.ticks_diff(utime.ticks_ms(), play_start) > 300000:
+            print("[play timeout]")
             stop_audio()
             number = ""
             start_dialtone()
             state = STATE_OFF_HOOK
+            continue
 
-        utime.sleep_ms(100)
+        # Check BUSY pin: HIGH = idle (playback finished)
+        # Skip first 2s to let DFPlayer start
+        if utime.ticks_diff(utime.ticks_ms(), play_start) > 2000:
+            if busy_pin.value() == 1:
+                print("[playback finished]")
+                play_sfx(config.SFX_HANGUP)
+                utime.sleep_ms(500)
+                stop_audio()
+                number = ""
+                start_dialtone()
+                state = STATE_OFF_HOOK
+                continue
+
+        # Any key press interrupts playback and returns to dial tone
+        key = get_key_timeout(200)
+        if key is not None:
+            wait_release()
+            print("[interrupted by keypress]")
+            stop_audio()
+            utime.sleep_ms(200)
+            number = ""
+            start_dialtone()
+            state = STATE_OFF_HOOK

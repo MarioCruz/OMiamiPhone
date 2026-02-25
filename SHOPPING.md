@@ -39,6 +39,4 @@ Everything you need to buy, with search terms and sourcing tips.
 | Item | Search Term | ~Price | Why |
 |------|------------|--------|-----|
 | USB wall adapter (5V 1A+) | "USB wall charger 5V" | $5-8 | Run the phone standalone without a laptop |
-| Soldering iron + solder | — | $15-25 | For permanent connections (vs breadboard) |
-| Heat shrink tubing | "heat shrink tubing assortment" | $5-7 | Clean up soldered wire connections |
-| Project enclosure or wooden box | — | varies | If you're not using the phone body as the case |
+

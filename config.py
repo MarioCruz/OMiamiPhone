@@ -6,18 +6,19 @@
 # =============================================================================
 
 # --- Hardware Flags ---
-HOOK_ENABLED = False      # False = skip hook switch (always acts off-hook)
-AUDIO_ENABLED = False     # False = skip DFPlayer (prints debug instead)
+HOOK_ENABLED = True       # False = skip hook switch (always acts off-hook)
+AUDIO_ENABLED = True      # False = skip DFPlayer (prints debug instead)
 
 # --- Hook Switch ---
 HOOK_PIN = 22             # GPIO pin for hook switch
-HOOK_ACTIVE_HIGH = True   # True = HIGH means off-hook (NC switch with pull-up)
+HOOK_ACTIVE_HIGH = False  # True = HIGH means off-hook (NC switch with pull-up)
                           # False = LOW means off-hook (NO switch)
 
 # --- DFPlayer Mini ---
 DFPLAYER_UART = 1         # UART channel (1 = UART1)
 DFPLAYER_TX = 20          # GPIO pin for Pico TX -> DFPlayer RX (via 1K resistor)
 DFPLAYER_RX = 21          # GPIO pin for Pico RX <- DFPlayer TX
+DFPLAYER_BUSY = 16        # GPIO pin for DFPlayer BUSY (LOW = playing, HIGH = idle)
 VOLUME = 20               # 0-30, tune for your earpiece
 
 # --- Keypad ---
@@ -34,7 +35,7 @@ KEYMAP = [
 SFX_FOLDER = 1            # Folder 01 on SD card = sound effects
 POEM_FOLDER = 2           # Folder 02 on SD card = poems (mapped by number)
 RANDOM_FOLDER = 3         # Folder 03 on SD card = random poems (unknown numbers)
-RANDOM_COUNT = 1          # How many files in /03/ (update as you add more)
+RANDOM_COUNT = 5          # How many files in /03/ (update as you add more)
 
 # --- Sound Effect File Numbers (in /01/) ---
 SFX_DIALTONE       = 1
