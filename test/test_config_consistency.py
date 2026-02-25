@@ -221,3 +221,7 @@ class TestPinAssignments:
         cfg = load_config_values()
         assert cfg["DFPLAYER_TX"] == 20
         assert cfg["DFPLAYER_RX"] == 21
+
+    def test_dfplayer_busy_pin_is_gp16(self):
+        cfg = load_config_values()
+        assert cfg["DFPLAYER_BUSY"] == 16

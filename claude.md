@@ -48,7 +48,8 @@ Only 4 files deployed: `config.py`, `dfplayer.py`, `main.py` (from poetry_phone.
 | `SHOPPING.md` | No | Shopping list (extracted from SPEC.md) |
 | `USER_GUIDE.md` | No | How to add/remove poems and manage the SD card |
 | `test/` | No | 144 pytest tests with MicroPython mock framework |
-| `hardware_test/` | No | Hardware validation scripts (dfplayer_test.py, hook_test.py) |
+| `hardware_test/` | No | Hardware validation scripts (dfplayer_test, hook_test, busy_test, uart_probe, etc.) |
+| `Poems/` | No | Original poem MP3 source files (copied to sd_card/03/ with DFPlayer naming) |
 
 ## Test Suite
 
@@ -61,14 +62,17 @@ Run tests: `pytest test/ -v`
 - Columns (outputs): GP0, GP1, GP2
 - Rows (inputs, pull-up): GP6 (top), GP5, GP4, GP3 (bottom)
 - Bottom row (GP3: *, 0, #) is noisy — needs aggressive debounce
-- Debounce: 5 stable reads to accept, 10 clean reads + 100ms to release
+- Debounce: 5 stable reads to accept, 5 clean reads + 30ms to release
 
 ## DFPlayer Notes
 
 - Library: redoxcode/micropython-dfplayer (single file `dfplayer.py`)
-- `is_playing()` returns file number (not bool) — check `== 0` for stopped, `-1` for error
+- `is_playing()` is BROKEN on this clone — always returns `-1`. Do NOT use it.
+- **BUSY pin** (GP16) is the reliable way to detect end-of-track: LOW = playing, HIGH = idle
 - UART1: TX on GP20 (via 1K resistor), RX on GP21
+- BUSY pin on GP16 (input with pull-up)
 - Built-in amp drives 8-ohm phone earpiece directly
+- DFPlayer needs 5V (VBUS) — 3V3 won't work
 - SD card must be FAT32, ≤32GB
 - File naming: DFPlayer reads 3-digit prefix, ignores the rest (e.g., `001_dialtone.mp3`)
 - On macOS, run `dot_clean /Volumes/<SDCard>` after copying to SD card
@@ -76,9 +80,9 @@ Run tests: `pytest test/ -v`
 ## Hardware Status
 
 - Keypad: wired and working (GP0-GP6)
-- DFPlayer: code ready, not yet physically wired
-- Hook switch: code ready, not yet physically wired
-- SD card: file structure defined, generate with `python tools/generate_tones.py`
+- DFPlayer: wired and working (UART1 on GP20/GP21, BUSY on GP16, 5V from VBUS)
+- Hook switch: wired and working (GP22, normally-open, LOW = off-hook)
+- SD card: loaded with SFX (/01/), 5 random poems (/03/), /02/ empty (mapped poems)
 
 ## Keypad Discovery (Historical)
 

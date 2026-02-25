@@ -39,13 +39,14 @@ The existing PhoneHack project proved that a 3x4 membrane keypad works with a Pi
 
 | GPIO | New Use | Direction | Notes |
 |------|---------|-----------|-------|
+| GP16 | **DFPlayer BUSY** | Input (pull-up) | LOW = playing, HIGH = idle |
 | GP20 | **DFPlayer UART1 TX** | Output | Via 1K resistor to DFPlayer RX |
 | GP21 | **DFPlayer UART1 RX** | Input | Direct from DFPlayer TX |
-| GP22 | **Hook switch** | Input (pull-up) | HIGH = off-hook, LOW = on-hook |
+| GP22 | **Hook switch** | Input (pull-up) | NO switch: LOW = off-hook, HIGH = on-hook |
 
 **Note:** UART1 TX/RX are constrained to specific pins on the RP2040. GP20/GP21 are the UART1 pair in the GP20+ range. GP23-25 are internal (SMPS, VBUS sense, onboard LED).
 
-### Available (GP7–GP19, GP26–GP28)
+### Available (GP7–GP15, GP17–GP19, GP26–GP28)
 
 All remaining GPIOs are free for future expansion (LEDs, rotary dial, coin slot, etc.).
 
@@ -58,19 +59,20 @@ Pico                              DFPlayer Mini
 ====                              =============
 GP20 (TX) ---[1K resistor]-----> RX
 GP21 (RX) <--------------------- TX
+GP16 <--------------------------- BUSY  (LOW = playing, HIGH = idle)
 VBUS (5V) ----------------------> VCC
 GND -----------------------------> GND
                                   SPK1 ----> Phone earpiece (+)
                                   SPK2 ----> Phone earpiece (-)
 
-Hook Switch (in phone cradle)
-=============================
+Hook Switch (normally-open, in phone cradle)
+=============================================
 GP22 ---+---- Hook Switch ---- GND
         |
    (internal pull-up)
 
-Handset DOWN (on-hook): switch closed, GP22 = LOW
-Handset UP (off-hook):  switch open,   GP22 = HIGH
+Handset DOWN (on-hook): switch open,   GP22 = HIGH
+Handset UP (off-hook):  switch closed, GP22 = LOW
 ```
 
 ---
@@ -239,8 +241,10 @@ df = DFPlayer(uart_id=1, tx_pin_id=20, rx_pin_id=21)
 df.volume(20)                    # 0-30
 df.play(folder=1, file=1)       # Play /01/001.mp3
 df.stop()                        # Stop playback
-df.is_playing()                  # Returns True/False
+df.is_playing()                  # BROKEN on some clones — always returns -1
 ```
+
+**Note:** `is_playing()` does not work on some DFPlayer clones (always returns -1). Use the BUSY pin (GP16) instead: LOW = playing, HIGH = idle. A 2-second grace period after `play()` is needed before checking BUSY, as it may briefly read HIGH during startup.
 
 No other external libraries needed — `machine.Pin`, `machine.UART`, `utime`, and `json` are all built into MicroPython.
 
@@ -270,21 +274,21 @@ mpremote connect /dev/cu.usbmodem1101 cp phone.py :main.py
 
 ## 12. Implementation Phases
 
-### Phase 1: Hardware Validation
-1. Wire DFPlayer to Pico (GP20 TX, GP21 RX, VBUS 5V, GND)
+### Phase 1: Hardware Validation ✅
+1. Wire DFPlayer to Pico (GP20 TX, GP21 RX, BUSY GP16, VBUS 5V, GND)
 2. Connect phone earpiece to SPK1/SPK2
 3. Load a test MP3 onto SD card as `/01/001.mp3`
 4. Write a minimal test script to verify sound in earpiece
 5. Tune volume for comfortable earpiece listening
 
-### Phase 2: Hook Switch
+### Phase 2: Hook Switch ✅
 1. Wire hook switch to GP22 + GND
-2. Test NC/NO behavior with multimeter
-3. Write test script printing on-hook/off-hook state changes
+2. Determined NO switch behavior (LOW = off-hook) via hook_test.py
+3. Set `HOOK_ACTIVE_HIGH = False` in config.py
 4. Verify debounce (no false triggers)
 
-### Phase 3: Sound Effects
-1. Generate DTMF tones, dial tone, ringback, busy signal (Python + numpy or download)
+### Phase 3: Sound Effects ✅
+1. Generate DTMF tones, dial tone, ringback, busy signal via `tools/generate_tones.py`
 2. Organize on SD card per folder structure
 3. Test each sound effect via UART commands
 

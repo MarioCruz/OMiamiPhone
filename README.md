@@ -19,8 +19,9 @@ Built with a Raspberry Pi Pico, DFPlayer Mini MP3 module, and a salvaged phone h
 - DFPlayer Mini MP3 module (YX5200) — UART, built-in amp
 - microSD card (FAT32, ≤32GB) — stores all audio
 - Phone handset with 8-ohm earpiece
-- Hook switch (normally-closed)
+- Hook switch (normally-open, on this handset)
 - 1K resistor (Pico TX → DFPlayer RX)
+- DFPlayer BUSY pin → Pico GP16 (end-of-track detection)
 
 See [SPEC.md](SPEC.md) for full wiring diagrams and BOM.
 
@@ -57,6 +58,7 @@ graph TB
     subgraph DFPLAYER["🔊 DFPlayer Mini"]
         DFP_RX["RX"]
         DFP_TX["TX"]
+        DFP_BUSY["BUSY"]
         DFP_VCC["VCC"]
         DFP_GND["GND"]
         DFP_SPK1["SPK1"]
@@ -81,8 +83,10 @@ graph TB
     GP4 --- ROW2
     GP3 --- ROW3
 
+    GP16["GP16"]
     GP20 -->|"1K Ω"| DFP_RX
     GP21 --- DFP_TX
+    GP16 --- DFP_BUSY
     VBUS --- DFP_VCC
     GND --- DFP_GND
 
@@ -104,9 +108,10 @@ graph TB
 | GP4  | Keypad row 2 (7, 8, 9) | Input (pull-up) |
 | GP5  | Keypad row 1 (4, 5, 6) | Input (pull-up) |
 | GP6  | Keypad row 0 (1, 2, 3) | Input (pull-up) |
+| GP16 | DFPlayer BUSY | Input (pull-up) |
 | GP20 | DFPlayer TX (via 1K resistor) | UART1 TX |
 | GP21 | DFPlayer RX | UART1 RX |
-| GP22 | Hook switch | Input (pull-up) |
+| GP22 | Hook switch (NO) | Input (pull-up) |
 
 ## State Machine
 
@@ -125,7 +130,8 @@ stateDiagram-v2
     CONNECTING --> PLAYING : Number found
     CONNECTING --> PLAYING : Random poem
     CONNECTING --> IDLE : Hang up
-    PLAYING --> OFF_HOOK : Poem finished
+    PLAYING --> OFF_HOOK : Playback finished (BUSY pin)
+    PLAYING --> OFF_HOOK : Key press interrupt
     PLAYING --> IDLE : Hang up
 ```
 
