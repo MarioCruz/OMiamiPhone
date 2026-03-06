@@ -20,7 +20,10 @@ for c in cols:
 hook_pin = Pin(config.HOOK_PIN, Pin.IN, Pin.PULL_UP)
 
 # --- DFPlayer BUSY pin (LOW = playing, HIGH = idle) ---
-busy_pin = Pin(config.DFPLAYER_BUSY, Pin.IN, Pin.PULL_UP)
+if config.BUSY_PIN_ENABLED:
+    busy_pin = Pin(config.BUSY_PIN, Pin.IN, Pin.PULL_UP)
+else:
+    busy_pin = None
 
 # --- DFPlayer Mini (optional — runs without it for testing) ---
 HAS_AUDIO = False
@@ -204,6 +207,44 @@ def wait_with_hangup_check(ms):
             return True
         utime.sleep_ms(20)
     return False
+
+
+def wait_for_audio_complete():
+    """Wait for audio to finish using BUSY pin. Returns True if hangup detected."""
+    if not config.BUSY_PIN_ENABLED or busy_pin is None:
+        # Fallback to is_playing() query if no BUSY pin
+        if HAS_AUDIO:
+            while True:
+                if check_hangup():
+                    return True
+                try:
+                    playing = df.is_playing()
+                    if playing == 0:
+                        return False
+                except:
+                    pass
+                utime.sleep_ms(100)
+        else:
+            # No audio hardware, simulate short playback
+            return wait_with_hangup_check(2000)
+    
+    # Use BUSY pin (LOW = playing, HIGH = idle)
+    # Wait for BUSY to go LOW (audio started)
+    timeout = utime.ticks_add(utime.ticks_ms(), 1000)
+    while utime.ticks_diff(timeout, utime.ticks_ms()) > 0:
+        if check_hangup():
+            return True
+        if busy_pin.value() == 0:
+            break
+        utime.sleep_ms(20)
+    
+    # Now wait for BUSY to go HIGH (audio finished)
+    while True:
+        if check_hangup():
+            return True
+        if busy_pin.value() == 1:
+            return False
+        utime.sleep_ms(50)
 
 
 def format_number(n):
@@ -414,7 +455,7 @@ while True:
         if number in PHONEBOOK:
             print(">>> Calling {}...".format(format_number(number)))
             play_sfx(config.SFX_RINGBACK)
-            hung_up = wait_with_hangup_check(config.RING_DURATION)
+            hung_up = wait_for_audio_complete()
             if hung_up:
                 stop_audio()
                 state = STATE_IDLE
@@ -431,7 +472,7 @@ while True:
         else:
             print(">>> {} - Random poem.".format(format_number(number)))
             play_sfx(config.SFX_RINGBACK)
-            hung_up = wait_with_hangup_check(config.RING_DURATION)
+            hung_up = wait_for_audio_complete()
             if hung_up:
                 stop_audio()
                 state = STATE_IDLE
@@ -461,10 +502,28 @@ while True:
             state = STATE_OFF_HOOK
             continue
 
-        # Check BUSY pin: HIGH = idle (playback finished)
+        # Check BUSY pin or is_playing(): playback finished?
         # Skip first 2s to let DFPlayer start
         if utime.ticks_diff(utime.ticks_ms(), play_start) > 2000:
-            if busy_pin.value() == 1:
+            finished = False
+            if config.BUSY_PIN_ENABLED and busy_pin is not None:
+                # Use BUSY pin (HIGH = idle)
+                if busy_pin.value() == 1:
+                    finished = True
+            elif HAS_AUDIO:
+                # Fallback to is_playing() query
+                try:
+                    playing = df.is_playing()
+                    if playing == 0:
+                        finished = True
+                except:
+                    pass
+            else:
+                # No audio hardware, assume finished after 3s
+                if utime.ticks_diff(utime.ticks_ms(), play_start) > 3000:
+                    finished = True
+            
+            if finished:
                 print("[playback finished]")
                 play_sfx(config.SFX_HANGUP)
                 utime.sleep_ms(500)

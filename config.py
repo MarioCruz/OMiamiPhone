@@ -8,11 +8,15 @@
 # --- Hardware Flags ---
 HOOK_ENABLED = True       # False = skip hook switch (always acts off-hook)
 AUDIO_ENABLED = True      # False = skip DFPlayer (prints debug instead)
+BUSY_PIN_ENABLED = True   # True = use DFPlayer BUSY pin to detect playback completion
 
 # --- Hook Switch ---
 HOOK_PIN = 22             # GPIO pin for hook switch
 HOOK_ACTIVE_HIGH = False  # True = HIGH means off-hook (NC switch with pull-up)
                           # False = LOW means off-hook (NO switch)
+
+# --- DFPlayer BUSY Pin ---
+BUSY_PIN = 16             # GPIO pin for DFPlayer BUSY (LOW = playing, HIGH = idle)
 
 # --- DFPlayer Mini ---
 DFPLAYER_UART = 1         # UART channel (1 = UART1)

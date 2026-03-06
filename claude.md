@@ -17,6 +17,15 @@ Art installation phone for O Miami poetry festival. Dial a number on a real phon
 - Close Thonny before using mpremote (port conflict)
 - `mpremote run` holds the serial port — unplug/replug Pico to release
 
+## GPIO Wiring
+
+- Keypad columns (outputs): GP0, GP1, GP2
+- Keypad rows (inputs, pull-up): GP6 (top), GP5, GP4, GP3 (bottom)
+- Hook switch: GP22 (NO switch, pull-up, LOW = on-hook, HIGH = off-hook)
+- DFPlayer TX: GP20 (via 1K resistor to DFPlayer RX)
+- DFPlayer RX: GP21 (direct from DFPlayer TX)
+- DFPlayer BUSY: GP16 (LOW = playing, HIGH = idle)
+
 ## Deploy Commands
 
 ```bash
@@ -62,13 +71,15 @@ Run tests: `pytest test/ -v`
 - Columns (outputs): GP0, GP1, GP2
 - Rows (inputs, pull-up): GP6 (top), GP5, GP4, GP3 (bottom)
 - Bottom row (GP3: *, 0, #) is noisy — needs aggressive debounce
-- Debounce: 5 stable reads to accept, 5 clean reads + 30ms to release
+- Debounce: 5 stable reads to accept, 10 clean reads + 100ms to release
 
 ## DFPlayer Notes
 
 - Library: redoxcode/micropython-dfplayer (single file `dfplayer.py`)
 - `is_playing()` is BROKEN on this clone — always returns `-1`. Do NOT use it.
 - **BUSY pin** (GP16) is the reliable way to detect end-of-track: LOW = playing, HIGH = idle
+- `wait_for_audio_complete()` uses BUSY pin when available, falls back to `is_playing()` query if not
+- All audio playback (poems, special codes, ringback) now waits for completion instead of fixed timeouts
 - UART1: TX on GP20 (via 1K resistor), RX on GP21
 - BUSY pin on GP16 (input with pull-up)
 - Built-in amp drives 8-ohm phone earpiece directly
