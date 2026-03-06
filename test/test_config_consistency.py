@@ -110,6 +110,7 @@ class TestConfigValues:
             cfg["SFX_BUSY"], cfg["SFX_HANGUP"],
             cfg["SFX_OPERATOR"], cfg["SFX_NOT_IN_SERVICE"],
             cfg.get("SFX_311", 19), cfg.get("SFX_411", 20), cfg.get("SFX_305", 21),
+            cfg.get("SFX_911", 22),
         }
         dtmf_nums = set(cfg["DTMF_FILE"].values())
         overlap = sfx_nums & dtmf_nums
@@ -207,11 +208,11 @@ class TestPinAssignments:
         pins.append(cfg["DFPLAYER_RX"])
         assert len(pins) == len(set(pins)), f"Pin conflict: {pins}"
 
-    def test_keypad_pins_are_gp0_to_gp6(self):
+    def test_keypad_pins_are_gp0_to_gp7(self):
         cfg = load_config_values()
         all_keypad = cfg["COL_PINS"] + cfg["ROW_PINS"]
         for pin in all_keypad:
-            assert 0 <= pin <= 6, f"Keypad pin GP{pin} outside expected range"
+            assert 0 <= pin <= 7, f"Keypad pin GP{pin} outside expected range"
 
     def test_hook_pin_is_gp22(self):
         cfg = load_config_values()
@@ -222,6 +223,6 @@ class TestPinAssignments:
         assert cfg["DFPLAYER_TX"] == 20
         assert cfg["DFPLAYER_RX"] == 21
 
-    def test_dfplayer_busy_pin_is_gp16(self):
+    def test_dfplayer_busy_pin_is_gp17(self):
         cfg = load_config_values()
-        assert cfg["DFPLAYER_BUSY"] == 16
+        assert cfg["DFPLAYER_BUSY"] == 17

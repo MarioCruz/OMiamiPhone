@@ -21,7 +21,7 @@ Built with a Raspberry Pi Pico, DFPlayer Mini MP3 module, and a salvaged phone h
 - Phone handset with 8-ohm earpiece
 - Hook switch (normally-open, on this handset)
 - 1K resistor (Pico TX → DFPlayer RX)
-- DFPlayer BUSY pin → Pico GP16 (end-of-track detection)
+- DFPlayer BUSY pin → Pico GP17 (end-of-track detection)
 
 See [SPEC.md](SPEC.md) for full wiring diagrams and BOM.
 
@@ -35,9 +35,10 @@ graph TB
         GP1["GP1"]
         GP2["GP2"]
         GP3["GP3"]
-        GP4["GP4"]
         GP5["GP5"]
         GP6["GP6"]
+        GP7["GP7"]
+        GP17["GP17"]
         GP20["GP20"]
         GP21["GP21"]
         GP22["GP22"]
@@ -80,13 +81,12 @@ graph TB
     GP2 --- COL2
     GP6 --- ROW0
     GP5 --- ROW1
-    GP4 --- ROW2
+    GP7 --- ROW2
     GP3 --- ROW3
 
-    GP16["GP16"]
     GP20 -->|"1K Ω"| DFP_RX
     GP21 --- DFP_TX
-    GP16 --- DFP_BUSY
+    GP17 --- DFP_BUSY
     VBUS --- DFP_VCC
     GND --- DFP_GND
 
@@ -105,10 +105,10 @@ graph TB
 | GP1  | Keypad column 1 | Output |
 | GP2  | Keypad column 2 | Output |
 | GP3  | Keypad row 3 (*, 0, #) | Input (pull-up) |
-| GP4  | Keypad row 2 (7, 8, 9) | Input (pull-up) |
 | GP5  | Keypad row 1 (4, 5, 6) | Input (pull-up) |
 | GP6  | Keypad row 0 (1, 2, 3) | Input (pull-up) |
-| GP16 | DFPlayer BUSY | Input (pull-up) |
+| GP7  | Keypad row 2 (7, 8, 9) | Input (pull-up) |
+| GP17 | DFPlayer BUSY | Input (pull-up) |
 | GP20 | DFPlayer TX (via 1K resistor) | UART1 TX |
 | GP21 | DFPlayer RX | UART1 RX |
 | GP22 | Hook switch (NO) | Input (pull-up) |
@@ -144,7 +144,8 @@ stateDiagram-v2
   - `305` — O Miami!
   - `311` — City services
   - `411` — Directory assistance
-  - `611`, `711`, `811`, `911` — Service messages
+  - `611`, `711`, `811` — Service messages
+  - `911` — Emergency redirect ("dial 911 on a real phone")
 - Numbers cannot start with `0` (except operator)
 - `*` clears input, `#` is ignored during dialing
 
@@ -164,7 +165,8 @@ sd_card/
 │   ├── 018_not_in_service.mp3
 │   ├── 019_311.mp3
 │   ├── 020_411.mp3
-│   └── 021_305_omiami.mp3
+│   ├── 021_305_omiami.mp3
+│   └── 022_911_emergency.mp3
 │
 ├── 02/                        ← Poems (mapped to phone numbers)
 │   ├── 001_8675309.mp3
@@ -226,5 +228,5 @@ AUDIO_ENABLED = False   # Skip DFPlayer (prints debug to console)
 | `SPEC.md` | No | Full hardware/software specification |
 | `tools/` | No | Desktop scripts (tone generators, keypad discovery, etc.) |
 | `hardware_test/` | No | Hardware validation (DFPlayer, hook switch) |
-| `test/` | No | 144 pytest tests with MicroPython mock framework |
+| `test/` | No | 145 pytest tests with MicroPython mock framework |
 | `USER_GUIDE.md` | No | How to add/remove poems and manage the SD card |

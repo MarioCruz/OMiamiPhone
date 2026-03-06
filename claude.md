@@ -20,11 +20,11 @@ Art installation phone for O Miami poetry festival. Dial a number on a real phon
 ## GPIO Wiring
 
 - Keypad columns (outputs): GP0, GP1, GP2
-- Keypad rows (inputs, pull-up): GP6 (top), GP5, GP4, GP3 (bottom)
+- Keypad rows (inputs, pull-up): GP6 (top), GP5, GP7, GP3 (bottom)
 - Hook switch: GP22 (NO switch, pull-up, LOW = on-hook, HIGH = off-hook)
 - DFPlayer TX: GP20 (via 1K resistor to DFPlayer RX)
 - DFPlayer RX: GP21 (direct from DFPlayer TX)
-- DFPlayer BUSY: GP16 (LOW = playing, HIGH = idle)
+- DFPlayer BUSY: GP17 (LOW = playing, HIGH = idle)
 
 ## Deploy Commands
 
@@ -56,7 +56,7 @@ Only 4 files deployed: `config.py`, `dfplayer.py`, `main.py` (from poetry_phone.
 | `SPEC.md` | No | Full hardware/software specification |
 | `SHOPPING.md` | No | Shopping list (extracted from SPEC.md) |
 | `USER_GUIDE.md` | No | How to add/remove poems and manage the SD card |
-| `test/` | No | 144 pytest tests with MicroPython mock framework |
+| `test/` | No | 145 pytest tests with MicroPython mock framework |
 | `hardware_test/` | No | Hardware validation scripts (dfplayer_test, hook_test, busy_test, uart_probe, etc.) |
 | `Poems/` | No | Original poem MP3 source files (copied to sd_card/03/ with DFPlayer naming) |
 
@@ -64,24 +64,23 @@ Only 4 files deployed: `config.py`, `dfplayer.py`, `main.py` (from poetry_phone.
 
 Run tests: `pytest test/ -v`
 
-144 tests across 5 test files. Mock framework in `test/mock_micropython.py` uses AST parser to avoid MicroPython imports.
+145 tests across 5 test files. Mock framework in `test/mock_micropython.py` uses AST parser to avoid MicroPython imports.
 
 ## Keypad Wiring
 
 - Columns (outputs): GP0, GP1, GP2
-- Rows (inputs, pull-up): GP6 (top), GP5, GP4, GP3 (bottom)
+- Rows (inputs, pull-up): GP6 (top), GP5, GP7, GP3 (bottom)
 - Bottom row (GP3: *, 0, #) is noisy — needs aggressive debounce
-- Debounce: 5 stable reads to accept, 10 clean reads + 100ms to release
+- Debounce: 5 stable reads to accept, 5 clean reads + 30ms to release
 
 ## DFPlayer Notes
 
 - Library: redoxcode/micropython-dfplayer (single file `dfplayer.py`)
 - `is_playing()` is BROKEN on this clone — always returns `-1`. Do NOT use it.
-- **BUSY pin** (GP16) is the reliable way to detect end-of-track: LOW = playing, HIGH = idle
-- `wait_for_audio_complete()` uses BUSY pin when available, falls back to `is_playing()` query if not
+- **BUSY pin** (GP17) is the reliable way to detect end-of-track: LOW = playing, HIGH = idle
 - All audio playback (poems, special codes, ringback) now waits for completion instead of fixed timeouts
 - UART1: TX on GP20 (via 1K resistor), RX on GP21
-- BUSY pin on GP16 (input with pull-up)
+- BUSY pin on GP17 (input with pull-up)
 - Built-in amp drives 8-ohm phone earpiece directly
 - DFPlayer needs 5V (VBUS) — 3V3 won't work
 - SD card must be FAT32, ≤32GB
@@ -90,10 +89,10 @@ Run tests: `pytest test/ -v`
 
 ## Hardware Status
 
-- Keypad: wired and working (GP0-GP6)
-- DFPlayer: wired and working (UART1 on GP20/GP21, BUSY on GP16, 5V from VBUS)
+- Keypad: wired and working (GP0-GP3, GP5-GP7)
+- DFPlayer: wired and working (UART1 on GP20/GP21, BUSY on GP17, 5V from VBUS)
 - Hook switch: wired and working (GP22, normally-open, LOW = off-hook)
-- SD card: loaded with SFX (/01/), 5 random poems (/03/), /02/ empty (mapped poems)
+- SD card: loaded — /01/ SFX (22 files), /02/ empty (mapped poems), /03/ random poems (5 files)
 
 ## Keypad Discovery (Historical)
 
@@ -106,7 +105,7 @@ Used `keypad_probe.py` to brute-force every pin pair. Results:
 | 2   | GP1   | GP6   |
 | 3   | GP2   | GP6   |
 | 4   | GP0   | GP5   |
-| 7   | GP0   | GP4   |
+| 7   | GP0   | GP7   |
 | *   | GP0   | GP3   |
 
 ## What Didn't Work

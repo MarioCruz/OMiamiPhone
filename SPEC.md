@@ -31,7 +31,7 @@ The existing PhoneHack project proved that a 3x4 membrane keypad works with a Pi
 | GP1 | Keypad Column 1 | Output | Keys: 2, 5, 8, 0 |
 | GP2 | Keypad Column 2 | Output | Keys: 3, 6, 9, # |
 | GP3 | Keypad Row 3 | Input (pull-up) | Keys: *, 0, # — noisy, needs aggressive debounce |
-| GP4 | Keypad Row 2 | Input (pull-up) | Keys: 7, 8, 9 |
+| GP7 | Keypad Row 2 | Input (pull-up) | Keys: 7, 8, 9 (moved from GP4 — UART1 conflict) |
 | GP5 | Keypad Row 1 | Input (pull-up) | Keys: 4, 5, 6 |
 | GP6 | Keypad Row 0 | Input (pull-up) | Keys: 1, 2, 3 |
 
@@ -39,14 +39,14 @@ The existing PhoneHack project proved that a 3x4 membrane keypad works with a Pi
 
 | GPIO | New Use | Direction | Notes |
 |------|---------|-----------|-------|
-| GP16 | **DFPlayer BUSY** | Input (pull-up) | LOW = playing, HIGH = idle |
+| GP17 | **DFPlayer BUSY** | Input (pull-up) | LOW = playing, HIGH = idle (moved from GP16) |
 | GP20 | **DFPlayer UART1 TX** | Output | Via 1K resistor to DFPlayer RX |
 | GP21 | **DFPlayer UART1 RX** | Input | Direct from DFPlayer TX |
 | GP22 | **Hook switch** | Input (pull-up) | NO switch: LOW = off-hook, HIGH = on-hook |
 
 **Note:** UART1 TX/RX are constrained to specific pins on the RP2040. GP20/GP21 are the UART1 pair in the GP20+ range. GP23-25 are internal (SMPS, VBUS sense, onboard LED).
 
-### Available (GP7–GP15, GP17–GP19, GP26–GP28)
+### Available (GP4, GP8–GP16, GP18–GP19, GP26–GP28)
 
 All remaining GPIOs are free for future expansion (LEDs, rotary dial, coin slot, etc.).
 
@@ -59,7 +59,7 @@ Pico                              DFPlayer Mini
 ====                              =============
 GP20 (TX) ---[1K resistor]-----> RX
 GP21 (RX) <--------------------- TX
-GP16 <--------------------------- BUSY  (LOW = playing, HIGH = idle)
+GP17 <--------------------------- BUSY  (LOW = playing, HIGH = idle)
 VBUS (5V) ----------------------> VCC
 GND -----------------------------> GND
                                   SPK1 ----> Phone earpiece (+)
@@ -106,7 +106,8 @@ SD Card/
 │   ├── 018_not_in_service.mp3     ← Record your own
 │   ├── 019_311.mp3                ← City services
 │   ├── 020_411.mp3                ← Directory assistance
-│   └── 021_305_omiami.mp3         ← O Miami!
+│   ├── 021_305_omiami.mp3         ← O Miami!
+│   └── 022_911_emergency.mp3     ← 911 emergency
 │
 └── /02/                           ← Poems
     ├── 001_8675309.mp3
@@ -160,6 +161,7 @@ The `file` value maps to the file number in folder `/02/` on the SD card.
 | DTMF # | 941Hz + 1477Hz | ~150ms | 01/016 |
 | Operator | Voice recording | ~3s | 01/017 |
 | Not in service | Voice recording | ~4s | 01/018 |
+| 911 emergency | Voice recording | ~5s | 01/022 |
 
 These can be generated with Python (numpy/scipy) or downloaded as standard telephone signals.
 
@@ -244,7 +246,7 @@ df.stop()                        # Stop playback
 df.is_playing()                  # BROKEN on some clones — always returns -1
 ```
 
-**Note:** `is_playing()` does not work on some DFPlayer clones (always returns -1). Use the BUSY pin (GP16) instead: LOW = playing, HIGH = idle. A 2-second grace period after `play()` is needed before checking BUSY, as it may briefly read HIGH during startup.
+**Note:** `is_playing()` does not work on some DFPlayer clones (always returns -1). Use the BUSY pin (GP17) instead: LOW = playing, HIGH = idle. A 2-second grace period after `play()` is needed before checking BUSY, as it may briefly read HIGH during startup.
 
 No other external libraries needed — `machine.Pin`, `machine.UART`, `utime`, and `json` are all built into MicroPython.
 
@@ -275,7 +277,7 @@ mpremote connect /dev/cu.usbmodem1101 cp phone.py :main.py
 ## 12. Implementation Phases
 
 ### Phase 1: Hardware Validation ✅
-1. Wire DFPlayer to Pico (GP20 TX, GP21 RX, BUSY GP16, VBUS 5V, GND)
+1. Wire DFPlayer to Pico (GP20 TX, GP21 RX, BUSY GP17, VBUS 5V, GND)
 2. Connect phone earpiece to SPK1/SPK2
 3. Load a test MP3 onto SD card as `/01/001.mp3`
 4. Write a minimal test script to verify sound in earpiece

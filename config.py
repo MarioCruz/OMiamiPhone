@@ -8,26 +8,22 @@
 # --- Hardware Flags ---
 HOOK_ENABLED = True       # False = skip hook switch (always acts off-hook)
 AUDIO_ENABLED = True      # False = skip DFPlayer (prints debug instead)
-BUSY_PIN_ENABLED = True   # True = use DFPlayer BUSY pin to detect playback completion
 
 # --- Hook Switch ---
 HOOK_PIN = 22             # GPIO pin for hook switch
 HOOK_ACTIVE_HIGH = False  # True = HIGH means off-hook (NC switch with pull-up)
                           # False = LOW means off-hook (NO switch)
 
-# --- DFPlayer BUSY Pin ---
-BUSY_PIN = 16             # GPIO pin for DFPlayer BUSY (LOW = playing, HIGH = idle)
-
 # --- DFPlayer Mini ---
 DFPLAYER_UART = 1         # UART channel (1 = UART1)
 DFPLAYER_TX = 20          # GPIO pin for Pico TX -> DFPlayer RX (via 1K resistor)
 DFPLAYER_RX = 21          # GPIO pin for Pico RX <- DFPlayer TX
-DFPLAYER_BUSY = 16        # GPIO pin for DFPlayer BUSY (LOW = playing, HIGH = idle)
+DFPLAYER_BUSY = 17        # GPIO pin for DFPlayer BUSY (LOW = playing, HIGH = idle)
 VOLUME = 20               # 0-30, tune for your earpiece
 
 # --- Keypad ---
 COL_PINS = [0, 1, 2]      # GPIO pins for columns (output)
-ROW_PINS = [6, 5, 4, 3]   # GPIO pins for rows (input, pull-up)
+ROW_PINS = [6, 5, 7, 3]   # GPIO pins for rows (input, pull-up) — GP7 replaces GP4 (UART1 conflict)
 KEYMAP = [
     ['1', '2', '3'],
     ['4', '5', '6'],
@@ -51,6 +47,7 @@ SFX_NOT_IN_SERVICE = 18
 SFX_311            = 19   # 311 — City services
 SFX_411            = 20   # 411 — Directory assistance
 SFX_305            = 21   # 305 — O Miami!
+SFX_911            = 22   # 911 — Emergency redirect
 
 DTMF_FILE = {
     '0': 5,  '1': 6,  '2': 7,  '3': 8,
@@ -75,6 +72,6 @@ SPECIAL_CODES = {
     "611": SFX_OPERATOR,
     "711": SFX_OPERATOR,
     "811": SFX_OPERATOR,
-    "911": SFX_OPERATOR,
+    "911": SFX_911,            # Emergency redirect
     "305": SFX_305,            # O Miami!
 }

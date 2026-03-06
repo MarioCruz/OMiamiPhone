@@ -1,14 +1,14 @@
 from machine import Pin
 import utime
 
-# 3x4 phone keypad wiring (GP7 replaces GP4 for 7/8/9 row):
+# 3x4 phone keypad wiring:
 #        GP0  GP1  GP2
 # GP6:    1    2    3
 # GP5:    4    5    6
-# GP7:    7    8    9
+# GP4:    7    8    9
 # GP3:    *    0    #
 
-rows = [Pin(gp, Pin.IN, Pin.PULL_UP) for gp in [6, 5, 7, 3]]
+rows = [Pin(gp, Pin.IN, Pin.PULL_UP) for gp in [6, 5, 4, 3]]
 cols = [Pin(gp, Pin.OUT) for gp in [0, 1, 2]]
 
 KEYMAP = [
@@ -62,12 +62,12 @@ def wait_release():
     utime.sleep_ms(100)
 
 
-print("=== Keypad Test (GP7 for 7/8/9 row) ===")
+print("=== Keypad Test ===")
 print("Press any key to see what it maps to.\n")
 
 while True:
     key, pos = get_key()
-    row_gp = [6, 5, 7, 3][pos[0]]
+    row_gp = [6, 5, 4, 3][pos[0]]
     col_gp = [0, 1, 2][pos[1]]
     print("Key: {}  |  row={} (GP{})  col={} (GP{})".format(key, pos[0], row_gp, pos[1], col_gp))
     wait_release()
