@@ -25,10 +25,11 @@ These were used during the initial build to figure out how the 3x4 membrane keyp
 
 | Script | What it does |
 |--------|-------------|
-| `keypad_probe.py` | Brute-force pin discovery. Tries every pair of GP0-GP7 while you hold a key down. This is how we figured out which pins were columns and which were rows. |
+| `keypad_probe.py` | Brute-force pin discovery. Tries every pair of GP0-GP16 while you hold a key down. This is how we figured out which pins were columns and which were rows. |
+| `keypad_probe_8wire.py` | Continuous scanning probe for the new 8-wire keypad. Scans GP1-10 and GP16 every 500ms — hold a key and it reports all connected pin pairs. |
 | `keypad_scan.py` | Basic scanner using the confirmed wiring (cols: GP0-2, rows: GP6-3). Prints key presses to the console. First working scan after probe results. |
 | `keypad_mapper.py` | Experimental scanner that tried alternative row/column splits (rows on GP0-3, cols on GP4-7). Didn't work — kept here as a record of what we tried. |
-| `keypad_test.py` | Simple test harness for validating the `raw_scan()` function in isolation. Used for debugging the bottom row noise on GP3. |
+| `keypad_test.py` | Test harness that reads pin config from `config.py` and validates key presses. Shows the key label, row/col index, and GPIO for each press. |
 
 ## Earlier Phone Iterations
 

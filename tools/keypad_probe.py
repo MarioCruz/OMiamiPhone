@@ -2,7 +2,7 @@ from machine import Pin
 import utime
 
 # Try every combination of GP0-GP7 to find which pins connect
-GPIOS = [0, 1, 2, 3, 4, 5, 6, 7]
+GPIOS = [0, 1, 2, 3, 4, 5, 6, 7,8 ,9,10, 16]
 
 print("=== Keypad Probe ===")
 print("Press and HOLD a key, then hit Enter here...")
@@ -25,4 +25,6 @@ for out_gp in GPIOS:
     Pin(out_gp, Pin.IN)
 
 print("\nDone! Press more keys and run again to map them all.")
+
+
 

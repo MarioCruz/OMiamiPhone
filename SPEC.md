@@ -27,13 +27,13 @@ The existing PhoneHack project proved that a 3x4 membrane keypad works with a Pi
 
 | GPIO | Function | Direction | Notes |
 |------|----------|-----------|-------|
-| GP0 | Keypad Column 0 | Output | Keys: 1, 4, 7, * |
-| GP1 | Keypad Column 1 | Output | Keys: 2, 5, 8, 0 |
-| GP2 | Keypad Column 2 | Output | Keys: 3, 6, 9, # |
-| GP3 | Keypad Row 3 | Input (pull-up) | Keys: *, 0, # — noisy, needs aggressive debounce |
-| GP7 | Keypad Row 2 | Input (pull-up) | Keys: 7, 8, 9 (moved from GP4 — UART1 conflict) |
-| GP5 | Keypad Row 1 | Input (pull-up) | Keys: 4, 5, 6 |
-| GP6 | Keypad Row 0 | Input (pull-up) | Keys: 1, 2, 3 |
+| GP6 | Keypad Column 0 | Output | Keys: 1, 4, 7, * |
+| GP5 | Keypad Column 1 | Output | Keys: 2, 5, 8, 0 |
+| GP7 | Keypad Column 2 | Output | Keys: 3, 6, 9, # |
+| GP4 | Keypad Row 0 | Input (pull-up) | Keys: 1, 2, 3 |
+| GP2 | Keypad Row 1 | Input (pull-up) | Keys: 4, 5, 6 |
+| GP1 | Keypad Row 2 | Input (pull-up) | Keys: 7, 8, 9 |
+| GP0 | Keypad Row 3 | Input (pull-up) | Keys: *, 0, # |
 
 ### New Assignments (Poetry Phone)
 
@@ -46,7 +46,7 @@ The existing PhoneHack project proved that a 3x4 membrane keypad works with a Pi
 
 **Note:** UART1 TX/RX are constrained to specific pins on the RP2040. GP20/GP21 are the UART1 pair in the GP20+ range. GP23-25 are internal (SMPS, VBUS sense, onboard LED).
 
-### Available (GP4, GP8–GP16, GP18–GP19, GP26–GP28)
+### Available (GP3, GP8–GP16, GP18–GP19, GP26–GP28)
 
 All remaining GPIOs are free for future expansion (LEDs, rotary dial, coin slot, etc.).
 
@@ -194,7 +194,7 @@ IDLE ──(off-hook)──> OFF_HOOK ──(keypress)──> DIALING ──(num
 
 ### Key Design Point
 
-The existing `raw_scan()`, `get_key()`, `get_key_timeout()`, and `wait_release()` functions stay **completely unchanged**. They are proven and handle the noisy bottom row (GP3).
+The existing `raw_scan()`, `get_key()`, `get_key_timeout()`, and `wait_release()` functions stay **completely unchanged**. They are proven and handle the noisy bottom row (GP0).
 
 ---
 
@@ -318,7 +318,7 @@ mpremote connect /dev/cu.usbmodem1101 cp phone.py :main.py
 | Risk | Mitigation |
 |------|------------|
 | DFPlayer command latency (~100-200ms) | Acceptable for phone sim; real phones had slight delay too |
-| Bottom row noise (GP3: *, 0, #) | Existing aggressive debounce handles this — no changes needed |
+| Bottom row noise (GP0: *, 0, #) | Existing aggressive debounce handles this — no changes needed |
 | Hook switch bounce | 100ms debounce on on-hook detection |
 | macOS hidden files on SD card | Run `dot_clean` after copying files |
 | DFPlayer clone chip variations | redoxcode library handles common variants; test early |

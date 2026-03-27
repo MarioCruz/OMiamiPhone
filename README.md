@@ -34,7 +34,7 @@ graph TB
         GP0["GP0"]
         GP1["GP1"]
         GP2["GP2"]
-        GP3["GP3"]
+        GP4["GP4"]
         GP5["GP5"]
         GP6["GP6"]
         GP7["GP7"]
@@ -76,13 +76,13 @@ graph TB
         EAR_N["-"]
     end
 
-    GP0 --- COL0
-    GP1 --- COL1
-    GP2 --- COL2
-    GP6 --- ROW0
-    GP5 --- ROW1
-    GP7 --- ROW2
-    GP3 --- ROW3
+    GP6 --- COL0
+    GP5 --- COL1
+    GP7 --- COL2
+    GP4 --- ROW0
+    GP2 --- ROW1
+    GP1 --- ROW2
+    GP0 --- ROW3
 
     GP20 -->|"1K Ω"| DFP_RX
     GP21 --- DFP_TX
@@ -101,13 +101,13 @@ graph TB
 
 | GPIO | Function | Direction |
 |------|----------|-----------|
-| GP0  | Keypad column 0 | Output |
-| GP1  | Keypad column 1 | Output |
-| GP2  | Keypad column 2 | Output |
-| GP3  | Keypad row 3 (*, 0, #) | Input (pull-up) |
-| GP5  | Keypad row 1 (4, 5, 6) | Input (pull-up) |
-| GP6  | Keypad row 0 (1, 2, 3) | Input (pull-up) |
-| GP7  | Keypad row 2 (7, 8, 9) | Input (pull-up) |
+| GP0  | Keypad row 3 (*, 0, #) | Input (pull-up) |
+| GP1  | Keypad row 2 (7, 8, 9) | Input (pull-up) |
+| GP2  | Keypad row 1 (4, 5, 6) | Input (pull-up) |
+| GP4  | Keypad row 0 (1, 2, 3) | Input (pull-up) |
+| GP5  | Keypad column 1 | Output |
+| GP6  | Keypad column 0 | Output |
+| GP7  | Keypad column 2 | Output |
 | GP17 | DFPlayer BUSY | Input (pull-up) |
 | GP20 | DFPlayer TX (via 1K resistor) | UART1 TX |
 | GP21 | DFPlayer RX | UART1 RX |

@@ -1,22 +1,9 @@
 from machine import Pin
 import utime
+import config
 
-# 3x4 phone keypad wiring (GP7 replaces GP4 for 7/8/9 row):
-#        GP0  GP1  GP2
-# GP6:    1    2    3
-# GP5:    4    5    6
-# GP7:    7    8    9
-# GP3:    *    0    #
-
-rows = [Pin(gp, Pin.IN, Pin.PULL_UP) for gp in [6, 5, 7, 3]]
-cols = [Pin(gp, Pin.OUT) for gp in [0, 1, 2]]
-
-KEYMAP = [
-    ['1', '2', '3'],
-    ['4', '5', '6'],
-    ['7', '8', '9'],
-    ['*', '0', '#'],
-]
+rows = [Pin(gp, Pin.IN, Pin.PULL_UP) for gp in config.ROW_PINS]
+cols = [Pin(gp, Pin.OUT) for gp in config.COL_PINS]
 
 for c in cols:
     c.value(1)
@@ -43,7 +30,7 @@ def get_key():
         if hit is not None and hit == last:
             count += 1
             if count >= 5:
-                return KEYMAP[hit[0]][hit[1]], hit
+                return config.KEYMAP[hit[0]][hit[1]], hit
         else:
             count = 1 if hit is not None else 0
             last = hit
@@ -62,12 +49,14 @@ def wait_release():
     utime.sleep_ms(100)
 
 
-print("=== Keypad Test (GP7 for 7/8/9 row) ===")
+print("=== Keypad Test (from config.py) ===")
+print("COL_PINS:", config.COL_PINS)
+print("ROW_PINS:", config.ROW_PINS)
 print("Press any key to see what it maps to.\n")
 
 while True:
     key, pos = get_key()
-    row_gp = [6, 5, 7, 3][pos[0]]
-    col_gp = [0, 1, 2][pos[1]]
+    row_gp = config.ROW_PINS[pos[0]]
+    col_gp = config.COL_PINS[pos[1]]
     print("Key: {}  |  row={} (GP{})  col={} (GP{})".format(key, pos[0], row_gp, pos[1], col_gp))
     wait_release()

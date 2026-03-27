@@ -22,8 +22,13 @@ DFPLAYER_BUSY = 17        # GPIO pin for DFPlayer BUSY (LOW = playing, HIGH = id
 VOLUME = 20               # 0-30, tune for your earpiece
 
 # --- Keypad ---
-COL_PINS = [0, 1, 2]      # GPIO pins for columns (output)
-ROW_PINS = [6, 5, 7, 3]   # GPIO pins for rows (input, pull-up) — GP7 replaces GP4 (UART1 conflict)
+# Old phone (7-wire, 3x4):
+# COL_PINS = [0, 1, 2]      # GPIO pins for columns (output)
+# ROW_PINS = [6, 5, 7, 3]   # GPIO pins for rows (input, pull-up)
+
+# New phone (8-wire, 3x4):
+COL_PINS = [6, 5, 7]      # GPIO pins for columns (output)
+ROW_PINS = [4, 2, 1, 0]   # GPIO pins for rows (input, pull-up)
 KEYMAP = [
     ['1', '2', '3'],
     ['4', '5', '6'],

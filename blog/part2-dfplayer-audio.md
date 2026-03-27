@@ -123,16 +123,16 @@ The DFPlayer has a hardware pin called BUSY that does exactly what `is_playing()
 
 No UART queries, no parsing responses, no clone compatibility issues. Just read a pin.
 
-I connected it to GP16 on the Pico:
+I connected it to GP17 on the Pico:
 
 ```
-DFPlayer BUSY ----> Pico GP16 (input, pull-up)
+DFPlayer BUSY ----> Pico GP17 (input, pull-up)
 ```
 
 Then wrote a quick test to verify:
 
 ```python
-busy = Pin(16, Pin.IN, Pin.PULL_UP)
+busy = Pin(17, Pin.IN, Pin.PULL_UP)
 
 df.play(1, 1)  # play dial tone
 

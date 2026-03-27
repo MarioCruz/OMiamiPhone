@@ -116,13 +116,13 @@ Here's how the keypad connects to the Pico:
 ```
 Pico GPIO    Keypad Function
 ---------    ---------------
-GP0          Column 0 (1, 4, 7, *)    ← Output
-GP1          Column 1 (2, 5, 8, 0)    ← Output
-GP2          Column 2 (3, 6, 9, #)    ← Output
-GP3          Row 3 (*, 0, #)          ← Input (pull-up)
-GP4          Row 2 (7, 8, 9)          ← Input (pull-up)
-GP5          Row 1 (4, 5, 6)          ← Input (pull-up)
-GP6          Row 0 (1, 2, 3)          ← Input (pull-up)
+GP6          Column 0 (1, 4, 7, *)    ← Output
+GP5          Column 1 (2, 5, 8, 0)    ← Output
+GP7          Column 2 (3, 6, 9, #)    ← Output
+GP4          Row 0 (1, 2, 3)          ← Input (pull-up)
+GP2          Row 1 (4, 5, 6)          ← Input (pull-up)
+GP1          Row 2 (7, 8, 9)          ← Input (pull-up)
+GP0          Row 3 (*, 0, #)          ← Input (pull-up)
 ```
 
 The scanning works by pulling each column LOW one at a time, then reading the four row pins. If a key is pressed on that column, the corresponding row will read LOW (pulled down through the key switch). The Pico's internal pull-up resistors keep the row pins HIGH when no key is pressed — no external components needed.
