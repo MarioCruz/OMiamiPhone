@@ -190,6 +190,41 @@ A simple hardware test confirmed the behavior — rock solid transitions, no bou
 
 The phone checks for hangup in every state. Pick up the handset, you get a dial tone. Put it down at any point — mid-dial, mid-ring, mid-poem — everything stops and resets.
 
+## The Invisible Bug: UART1 Steals Your Keypad Pins
+
+This was the hardest bug in the entire project. After wiring up the DFPlayer, the keypad started failing intermittently. Sometimes all keys worked. Sometimes row 0 (1-2-3) or column 1 (2-5-8-0) would go dead. Restarting the script sometimes fixed it. Rebooting the Pico sometimes didn't.
+
+I spent hours checking wires, adding pull-ups, swapping GPIO pins. Nothing made sense — the keypad had been rock solid before I added the DFPlayer.
+
+The problem wasn't the wiring. It was one line of code:
+
+```python
+self.uart = machine.UART(1, 9600)
+```
+
+This is how the DFPlayer library initialized UART1. Seems harmless — you're creating a UART on channel 1 at 9600 baud. But on the RP2040, **`UART(1, 9600)` without explicit `tx`/`rx` parameters silently claims GP4 and GP5** — the default UART1 pins. Even if you immediately call `.init()` with different pins (GP20/GP21), the damage is done. GP4 and GP5 have been briefly reconfigured as UART pins, and they don't always cleanly return to GPIO mode.
+
+GP4 is keypad row 0 (keys 1, 2, 3). GP5 is keypad column 1 (keys 2, 5, 8, 0). The DFPlayer init was silently breaking half the keypad on every boot.
+
+Why did restarting sometimes fix it? Because the pin initialization order is non-deterministic during a soft restart. Sometimes the keypad GPIO setup ran after the UART init and re-claimed the pins. Sometimes it didn't.
+
+### The Fix
+
+Pass the pins directly in the constructor so UART1 never touches GP4/GP5:
+
+```python
+# Before (broken): claims GP4/GP5 briefly
+self.uart = machine.UART(1, 9600)
+self.uart.init(9600, bits=8, parity=None, stop=1, tx=20, rx=21)
+
+# After (fixed): never touches GP4/GP5
+self.uart = machine.UART(1, 9600, bits=8, parity=None, stop=1, tx=20, rx=21)
+```
+
+One line. Hours of debugging. The lesson: **on RP2040, always pass explicit `tx` and `rx` pins when creating a UART.** The default pins are not just defaults — they get physically configured even before you call `.init()`.
+
+If you're using a DFPlayer (or any UART device) on a Pico and some GPIO pins mysteriously stop working, check if your UART init is silently claiming its default pins. This is not documented anywhere obvious.
+
 ## Putting It All Together
 
 The complete system uses a five-state machine:
@@ -226,7 +261,7 @@ Dial a number that's in the phonebook? You get that specific poem. Dial anything
 
 The phone is fully functional now — pick up, hear the dial tone, punch in a number, hear it ring, listen to a poem, hang up. Everything a real phone call should feel like, minus the cell tower.
 
-**Next up: [Part 3 — Coming Soon](part3-coming-soon.md)**
+**Next up: [Part 3 — Kid-Proofing and Easter Eggs](part3-bulletproof-and-eggs.md)**
 
 ---
 
