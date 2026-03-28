@@ -13,6 +13,8 @@ AUDIO_ENABLED = True      # False = skip DFPlayer (prints debug instead)
 HOOK_PIN = 22             # GPIO pin for hook switch
 HOOK_ACTIVE_HIGH = False  # True = HIGH means off-hook (NC switch with pull-up)
                           # False = LOW means off-hook (NO switch)
+WATCHDOG_ENABLED = True   # False = disable WDT (for development/REPL)
+WATCHDOG_TIMEOUT = 8000   # WDT timeout in ms (max 8388ms on RP2040)
 
 # --- DFPlayer Mini ---
 DFPLAYER_UART = 1         # UART channel (1 = UART1)
@@ -69,8 +71,10 @@ DTMF_FILE = {
 DIALTONE_TIMEOUT = 30000   # How long dial tone plays before giving up
 SEVEN_DIGIT_WAIT = 2000    # Wait after 7 digits for more input
 SPECIAL_CODE_WAIT = 1000   # Wait after special code (0, 411, etc.)
+DIALING_TIMEOUT = 8000     # Max pause between digits before timing out
 RING_DURATION = 5000       # How long ringback plays before poem starts
 BUSY_DURATION = 4000       # How long busy signal plays
+OFF_HOOK_TIMEOUT = 120000  # Max total off-hook time before forced idle (2 min)
 
 # --- Special Codes ---
 # Map short-dial codes to SFX file numbers in /01/

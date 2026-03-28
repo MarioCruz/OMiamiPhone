@@ -2,6 +2,7 @@ from machine import Pin
 import utime
 import json
 import random
+import gc
 import config
 
 # =============================================================================
@@ -15,6 +16,9 @@ cols = [Pin(gp, Pin.OUT) for gp in config.COL_PINS]
 
 for c in cols:
     c.value(1)
+
+# --- Heartbeat LED (onboard, GP25) ---
+led = Pin(25, Pin.OUT)
 
 # --- Hook switch ---
 hook_pin = Pin(config.HOOK_PIN, Pin.IN, Pin.PULL_UP)
@@ -91,6 +95,8 @@ def get_key_timeout(timeout_ms):
     count = 0
     last = None
     while utime.ticks_diff(deadline, utime.ticks_ms()) > 0:
+        if wdt:
+            wdt.feed()
         if check_hangup():
             return None
         hit = raw_scan()
@@ -106,8 +112,16 @@ def get_key_timeout(timeout_ms):
 
 
 def wait_release():
+    """Wait for key release. Returns True if key was stuck (2s timeout)."""
     clean = 0
+    deadline = utime.ticks_add(utime.ticks_ms(), 2000)
     while clean < 5:
+        if wdt:
+            wdt.feed()
+        if check_hangup():
+            return False
+        if utime.ticks_diff(deadline, utime.ticks_ms()) <= 0:
+            return True  # stuck key
         hit = raw_scan()
         if hit is None:
             clean += 1
@@ -115,6 +129,7 @@ def wait_release():
             clean = 0
         utime.sleep_ms(5)
     utime.sleep_ms(30)
+    return False
 
 
 # =============================================================================
@@ -134,11 +149,15 @@ def is_off_hook():
 
 
 def check_hangup():
-    """Quick single-read check if handset was replaced."""
+    """Debounced check — True only if 3 consecutive reads say on-hook."""
     if not config.HOOK_ENABLED:
         return False
-    val = hook_pin.value()
-    return (val == 1) != config.HOOK_ACTIVE_HIGH
+    for _ in range(3):
+        val = hook_pin.value()
+        if not ((val == 1) != config.HOOK_ACTIVE_HIGH):
+            return False
+        utime.sleep_ms(5)
+    return True
 
 
 # =============================================================================
@@ -149,7 +168,8 @@ def check_hangup():
 _SFX_NAMES = {1: "DIALTONE", 2: "RINGBACK", 3: "BUSY", 4: "HANGUP",
               17: "OPERATOR", 18: "NOT_IN_SERVICE",
               19: "311_CITY_SERVICES", 20: "411_DIRECTORY", 21: "305_O_MIAMI",
-              22: "911_EMERGENCY"}
+              22: "911_EMERGENCY", 23: "211_COMMUNITY", 24: "511_TRAFFIC",
+              25: "711_RELAY", 26: "811_DIG", 27: "611_CUSTOMER_SERVICE"}
 
 
 def play_sfx(file_num):
@@ -201,6 +221,8 @@ def wait_with_hangup_check(ms):
     """Wait for a duration, but return True immediately if hangup detected."""
     deadline = utime.ticks_add(utime.ticks_ms(), ms)
     while utime.ticks_diff(deadline, utime.ticks_ms()) > 0:
+        if wdt:
+            wdt.feed()
         if check_hangup():
             return True
         utime.sleep_ms(20)
@@ -235,253 +257,351 @@ state = STATE_IDLE
 number = ""
 dialtone_start = 0
 play_start = 0
+off_hook_start = 0
 
+random.seed(utime.ticks_us())
+
+# --- Watchdog timer (reboots Pico if main loop hangs) ---
+wdt = None
+if config.WATCHDOG_ENABLED:
+    try:
+        from machine import WDT
+        wdt = WDT(timeout=config.WATCHDOG_TIMEOUT)
+        print("Watchdog enabled ({}ms)".format(config.WATCHDOG_TIMEOUT))
+    except Exception as e:
+        print("Watchdog not available: {}".format(e))
+
+# --- Boot chime ---
 print("=== Poetry Phone ===")
+if HAS_AUDIO:
+    df.play(config.SFX_FOLDER, config.SFX_DIALTONE)
+    utime.sleep_ms(500)
+    df.stop()
+    utime.sleep_ms(100)
+    print("Boot chime OK")
 print("Waiting for handset lift...\n")
 
 while True:
 
-    # ----- IDLE: handset on cradle, waiting -----
-    if state == STATE_IDLE:
-        if is_off_hook():
-            print("[off-hook]")
-            state = STATE_OFF_HOOK
-            number = ""
-            start_dialtone()
-        else:
-            utime.sleep_ms(50)
+    if wdt:
+        wdt.feed()
+    led.value(1 - led.value())
+    gc.collect()
 
-    # ----- OFF_HOOK: playing dial tone, waiting for first key -----
-    elif state == STATE_OFF_HOOK:
-        if check_hangup():
-            stop_audio()
-            print("[on-hook]")
-            state = STATE_IDLE
-            continue
+    try:
 
-        if utime.ticks_diff(utime.ticks_ms(), dialtone_start) > config.DIALTONE_TIMEOUT:
-            stop_audio()
-            print("[dial tone timeout]")
-            play_sfx(config.SFX_BUSY)
-            wait_with_hangup_check(config.BUSY_DURATION)
-            stop_audio()
-            state = STATE_IDLE
-            continue
-
-        key = get_key_timeout(200)
-        if key is not None:
-            if key == '#':
-                pass  # ignore # during dial tone
-            elif key == '*':
-                pass  # already have dial tone, nothing to clear
+        # ----- IDLE: handset on cradle, waiting -----
+        if state == STATE_IDLE:
+            if is_off_hook():
+                print("[off-hook]")
+                state = STATE_OFF_HOOK
+                number = ""
+                off_hook_start = utime.ticks_ms()
+                start_dialtone()
             else:
-                stop_audio()
-                utime.sleep_ms(30)
-                play_dtmf(key)
-                wait_release()
-                number += key
-                print(number)
-                state = STATE_DIALING
+                utime.sleep_ms(50)
 
-    # ----- DIALING: accumulating digits with DTMF tones -----
-    elif state == STATE_DIALING:
-        if check_hangup():
-            stop_audio()
-            print("[on-hook]")
-            state = STATE_IDLE
-            number = ""
-            continue
-
-        # --- 10 digits: submit immediately ---
-        if len(number) == 10:
-            local = number[3:]
-            print("(stripped area code {})".format(number[:3]))
-            number = local
-            state = STATE_CONNECTING
-            continue
-
-        # --- 7 digits: wait 2 seconds for more input ---
-        if len(number) == 7:
-            key = get_key_timeout(config.SEVEN_DIGIT_WAIT)
+        # ----- OFF_HOOK: playing dial tone, waiting for first key -----
+        elif state == STATE_OFF_HOOK:
             if check_hangup():
                 stop_audio()
+                print("[on-hook]")
                 state = STATE_IDLE
-                number = ""
                 continue
-            if key is None:
-                state = STATE_CONNECTING
+
+            # Hard off-hook timeout (kid walked away with handset dangling)
+            if utime.ticks_diff(utime.ticks_ms(), off_hook_start) > config.OFF_HOOK_TIMEOUT:
+                print("[off-hook timeout]")
+                stop_audio()
+                state = STATE_IDLE
                 continue
-            else:
-                play_dtmf(key)
-                wait_release()
-                if key == '*':
-                    number = ""
-                    print("[cleared]")
-                    start_dialtone()
-                    state = STATE_OFF_HOOK
-                elif key != '#':
+
+            if utime.ticks_diff(utime.ticks_ms(), dialtone_start) > config.DIALTONE_TIMEOUT:
+                stop_audio()
+                print("[dial tone timeout]")
+                play_sfx(config.SFX_BUSY)
+                wait_with_hangup_check(config.BUSY_DURATION)
+                stop_audio()
+                state = STATE_IDLE
+                continue
+
+            key = get_key_timeout(200)
+            if key is not None:
+                if key == '#':
+                    pass  # ignore # during dial tone
+                elif key == '*':
+                    pass  # already have dial tone, nothing to clear
+                else:
+                    stop_audio()
+                    utime.sleep_ms(30)
+                    play_dtmf(key)
+                    if wait_release():
+                        print("[stuck key]")
+                        number = ""
+                        start_dialtone()
+                        continue
                     number += key
                     print(number)
-                continue
+                    state = STATE_DIALING
 
-        # --- Leading zero: operator ---
-        if len(number) == 1 and number == "0":
-            next_key = get_key_timeout(config.SPECIAL_CODE_WAIT)
+        # ----- DIALING: accumulating digits with DTMF tones -----
+        elif state == STATE_DIALING:
             if check_hangup():
                 stop_audio()
+                print("[on-hook]")
                 state = STATE_IDLE
                 number = ""
                 continue
-            if next_key is None:
-                # Operator
+
+            # Hard off-hook timeout
+            if utime.ticks_diff(utime.ticks_ms(), off_hook_start) > config.OFF_HOOK_TIMEOUT:
+                print("[off-hook timeout]")
                 stop_audio()
-                play_sfx(config.SPECIAL_CODES["0"])
-                play_start = utime.ticks_ms()
-                state = STATE_PLAYING
-            else:
-                play_dtmf(next_key)
-                wait_release()
-                if next_key == '*':
-                    number = ""
-                    print("[cleared]")
-                    start_dialtone()
-                    state = STATE_OFF_HOOK
-                elif next_key != '#':
-                    print("Numbers can't start with 0.")
-                    number = ""
-                    play_sfx(config.SFX_BUSY)
-                    wait_with_hangup_check(3000)
+                number = ""
+                state = STATE_IDLE
+                continue
+
+            # --- 10 digits: submit immediately ---
+            if len(number) == 10:
+                local = number[3:]
+                print("(stripped area code {})".format(number[:3]))
+                number = local
+                state = STATE_CONNECTING
+                continue
+
+            # --- 7 digits: wait 2 seconds for more input ---
+            if len(number) == 7:
+                key = get_key_timeout(config.SEVEN_DIGIT_WAIT)
+                if check_hangup():
                     stop_audio()
-                    start_dialtone()
-                    state = STATE_OFF_HOOK
-            continue
-
-        # --- Subsequent digits ---
-        key = get_key()
-        if key is None:  # hangup
-            stop_audio()
-            state = STATE_IDLE
-            number = ""
-            continue
-        play_dtmf(key)
-        wait_release()
-
-        if key == '*':
-            number = ""
-            print("[cleared]")
-            start_dialtone()
-            state = STATE_OFF_HOOK
-            continue
-        elif key == '#':
-            continue
-
-        number += key
-        print(number)
-
-        # --- 3-digit special codes ---
-        if len(number) == 3 and number in config.SPECIAL_CODES:
-            next_key = get_key_timeout(config.SPECIAL_CODE_WAIT)
-            if check_hangup():
-                stop_audio()
-                state = STATE_IDLE
-                number = ""
-                continue
-            if next_key is None:
-                stop_audio()
-                play_sfx(config.SPECIAL_CODES[number])
-                play_start = utime.ticks_ms()
-                state = STATE_PLAYING
-            else:
-                play_dtmf(next_key)
-                wait_release()
-                if next_key == '*':
+                    state = STATE_IDLE
                     number = ""
-                    print("[cleared]")
-                    start_dialtone()
-                    state = STATE_OFF_HOOK
-                elif next_key != '#':
-                    number += next_key
-                    print(number)
+                    continue
+                if key is None:
+                    state = STATE_CONNECTING
+                    continue
+                else:
+                    play_dtmf(key)
+                    if wait_release():
+                        print("[stuck key]")
+                        number = ""
+                        start_dialtone()
+                        state = STATE_OFF_HOOK
+                        continue
+                    if key == '*':
+                        number = ""
+                        print("[cleared]")
+                        start_dialtone()
+                        state = STATE_OFF_HOOK
+                    elif key != '#':
+                        number += key
+                        print(number)
+                    continue
 
-    # ----- CONNECTING: ring or busy -----
-    elif state == STATE_CONNECTING:
-        if check_hangup():
-            stop_audio()
-            print("[on-hook]")
-            state = STATE_IDLE
-            number = ""
-            continue
-
-        if number in PHONEBOOK:
-            print(">>> Calling {}...".format(format_number(number)))
-            play_sfx(config.SFX_RINGBACK)
-            hung_up = wait_with_hangup_check(config.RING_DURATION)
-            if hung_up:
-                stop_audio()
-                state = STATE_IDLE
-                number = ""
+            # --- Leading zero: operator ---
+            if len(number) == 1 and number == "0":
+                next_key = get_key_timeout(config.SPECIAL_CODE_WAIT)
+                if check_hangup():
+                    stop_audio()
+                    state = STATE_IDLE
+                    number = ""
+                    continue
+                if next_key is None:
+                    # Operator
+                    stop_audio()
+                    play_sfx(config.SPECIAL_CODES["0"])
+                    play_start = utime.ticks_ms()
+                    state = STATE_PLAYING
+                else:
+                    play_dtmf(next_key)
+                    if wait_release():
+                        print("[stuck key]")
+                        number = ""
+                        start_dialtone()
+                        state = STATE_OFF_HOOK
+                        continue
+                    if next_key == '*':
+                        number = ""
+                        print("[cleared]")
+                        start_dialtone()
+                        state = STATE_OFF_HOOK
+                    elif next_key != '#':
+                        print("Numbers can't start with 0.")
+                        number = ""
+                        play_sfx(config.SFX_BUSY)
+                        wait_with_hangup_check(3000)
+                        stop_audio()
+                        start_dialtone()
+                        state = STATE_OFF_HOOK
                 continue
-            stop_audio()
-            utime.sleep_ms(200)
-            # Play the poem
-            poem_file = PHONEBOOK[number]["file"]
-            print('    Playing: "{}"'.format(PHONEBOOK[number]["title"]))
-            play_poem(poem_file)
-            play_start = utime.ticks_ms()
-            state = STATE_PLAYING
-        else:
-            print(">>> {} - Random poem.".format(format_number(number)))
-            play_sfx(config.SFX_RINGBACK)
-            hung_up = wait_with_hangup_check(config.RING_DURATION)
-            if hung_up:
+
+            # --- Subsequent digits ---
+            key = get_key_timeout(config.DIALING_TIMEOUT)
+            if key is None:
+                if check_hangup():
+                    stop_audio()
+                    state = STATE_IDLE
+                    number = ""
+                    continue
+                print("[dial timeout]")
+                play_sfx(config.SFX_BUSY)
+                wait_with_hangup_check(config.BUSY_DURATION)
                 stop_audio()
-                state = STATE_IDLE
                 number = ""
+                start_dialtone()
+                state = STATE_OFF_HOOK
                 continue
-            stop_audio()
-            utime.sleep_ms(200)
-            play_random_poem()
-            play_start = utime.ticks_ms()
-            state = STATE_PLAYING
+            play_dtmf(key)
+            if wait_release():
+                print("[stuck key]")
+                number = ""
+                start_dialtone()
+                state = STATE_OFF_HOOK
+                continue
 
-    # ----- PLAYING: poem/sfx is playing -----
-    elif state == STATE_PLAYING:
-        if check_hangup():
-            stop_audio()
-            print("[on-hook]")
-            state = STATE_IDLE
-            number = ""
-            continue
+            if key == '*':
+                number = ""
+                print("[cleared]")
+                start_dialtone()
+                state = STATE_OFF_HOOK
+                continue
+            elif key == '#':
+                continue
 
-        # Safety timeout (5 minutes)
-        if utime.ticks_diff(utime.ticks_ms(), play_start) > 300000:
-            print("[play timeout]")
-            stop_audio()
-            number = ""
-            start_dialtone()
-            state = STATE_OFF_HOOK
-            continue
+            number += key
+            print(number)
 
-        # Check BUSY pin: HIGH = idle (playback finished)
-        # Skip first 2s to let DFPlayer start
-        if utime.ticks_diff(utime.ticks_ms(), play_start) > 2000:
-            if busy_pin.value() == 1:
-                print("[playback finished]")
-                play_sfx(config.SFX_HANGUP)
-                utime.sleep_ms(500)
+            # --- Reject overlong input ---
+            if len(number) > 10:
+                print("[too many digits]")
+                play_sfx(config.SFX_BUSY)
+                wait_with_hangup_check(config.BUSY_DURATION)
                 stop_audio()
                 number = ""
                 start_dialtone()
                 state = STATE_OFF_HOOK
                 continue
 
-        # Any key press interrupts playback and returns to dial tone
-        key = get_key_timeout(200)
-        if key is not None:
-            wait_release()
-            print("[interrupted by keypress]")
+            # --- 3-digit special codes ---
+            if len(number) == 3 and number in config.SPECIAL_CODES:
+                next_key = get_key_timeout(config.SPECIAL_CODE_WAIT)
+                if check_hangup():
+                    stop_audio()
+                    state = STATE_IDLE
+                    number = ""
+                    continue
+                if next_key is None:
+                    stop_audio()
+                    play_sfx(config.SPECIAL_CODES[number])
+                    play_start = utime.ticks_ms()
+                    state = STATE_PLAYING
+                else:
+                    play_dtmf(next_key)
+                    if wait_release():
+                        print("[stuck key]")
+                        number = ""
+                        start_dialtone()
+                        state = STATE_OFF_HOOK
+                        continue
+                    if next_key == '*':
+                        number = ""
+                        print("[cleared]")
+                        start_dialtone()
+                        state = STATE_OFF_HOOK
+                    elif next_key != '#':
+                        number += next_key
+                        print(number)
+
+        # ----- CONNECTING: ring or busy -----
+        elif state == STATE_CONNECTING:
+            if check_hangup():
+                stop_audio()
+                print("[on-hook]")
+                state = STATE_IDLE
+                number = ""
+                continue
+
+            if number in PHONEBOOK:
+                print(">>> Calling {}...".format(format_number(number)))
+                play_sfx(config.SFX_RINGBACK)
+                hung_up = wait_with_hangup_check(config.RING_DURATION)
+                if hung_up:
+                    stop_audio()
+                    state = STATE_IDLE
+                    number = ""
+                    continue
+                stop_audio()
+                utime.sleep_ms(200)
+                # Play the poem
+                poem_file = PHONEBOOK[number]["file"]
+                print('    Playing: "{}"'.format(PHONEBOOK[number]["title"]))
+                play_poem(poem_file)
+                play_start = utime.ticks_ms()
+                state = STATE_PLAYING
+            else:
+                print(">>> {} - Random poem.".format(format_number(number)))
+                play_sfx(config.SFX_RINGBACK)
+                hung_up = wait_with_hangup_check(config.RING_DURATION)
+                if hung_up:
+                    stop_audio()
+                    state = STATE_IDLE
+                    number = ""
+                    continue
+                stop_audio()
+                utime.sleep_ms(200)
+                play_random_poem()
+                play_start = utime.ticks_ms()
+                state = STATE_PLAYING
+
+        # ----- PLAYING: poem/sfx is playing -----
+        elif state == STATE_PLAYING:
+            if check_hangup():
+                stop_audio()
+                print("[on-hook]")
+                state = STATE_IDLE
+                number = ""
+                continue
+
+            # Safety timeout (5 minutes)
+            if utime.ticks_diff(utime.ticks_ms(), play_start) > 300000:
+                print("[play timeout]")
+                stop_audio()
+                number = ""
+                start_dialtone()
+                state = STATE_OFF_HOOK
+                continue
+
+            # Check BUSY pin: HIGH = idle (playback finished)
+            # Skip first 2s to let DFPlayer start
+            if utime.ticks_diff(utime.ticks_ms(), play_start) > 2000:
+                if busy_pin.value() == 1:
+                    print("[playback finished]")
+                    play_sfx(config.SFX_HANGUP)
+                    utime.sleep_ms(500)
+                    stop_audio()
+                    number = ""
+                    start_dialtone()
+                    state = STATE_OFF_HOOK
+                    continue
+
+            # Any key press interrupts playback and returns to dial tone
+            key = get_key_timeout(200)
+            if key is not None:
+                if wait_release():
+                    print("[stuck key]")
+                print("[interrupted by keypress]")
+                stop_audio()
+                utime.sleep_ms(200)
+                number = ""
+                start_dialtone()
+                state = STATE_OFF_HOOK
+
+    except Exception as e:
+        print("!!! ERROR: {}".format(e))
+        try:
             stop_audio()
-            utime.sleep_ms(200)
-            number = ""
-            start_dialtone()
-            state = STATE_OFF_HOOK
+        except:
+            pass
+        state = STATE_IDLE
+        number = ""
+        utime.sleep_ms(1000)

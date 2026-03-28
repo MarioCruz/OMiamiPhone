@@ -34,6 +34,9 @@ class MockUtime:
     def sleep_us(self, us):
         self._ticks += us // 1000
 
+    def ticks_us(self):
+        return self._ticks * 1000
+
     def advance(self, ms):
         """Test helper: advance time without sleep side effects."""
         self._ticks += ms
@@ -102,9 +105,20 @@ class MockUART:
         pass
 
 
+class MockWDT:
+    """Mock watchdog timer."""
+    def __init__(self, timeout=8000):
+        self.timeout = timeout
+        self.feed_count = 0
+
+    def feed(self):
+        self.feed_count += 1
+
+
 class MockMachine:
     Pin = MockPin
     UART = MockUART
+    WDT = MockWDT
 
 
 # =============================================================================
@@ -196,6 +210,7 @@ class PhoneSimulator:
         self.state = 0  # IDLE
         self.number = ""
         self.dialtone_start = 0
+        self.off_hook_start = 0
         self.off_hook = False
 
         # Config
@@ -215,6 +230,7 @@ class PhoneSimulator:
         self.SPECIAL_CODE_WAIT = 1000
         self.RING_DURATION = 5000
         self.BUSY_DURATION = 4000
+        self.OFF_HOOK_TIMEOUT = 120000
 
         # SFX numbers
         self.SFX_DIALTONE = 1
@@ -274,6 +290,7 @@ class PhoneSimulator:
         if self.state == self.STATE_IDLE:
             self.state = self.STATE_OFF_HOOK
             self.number = ""
+            self.off_hook_start = self.utime.ticks_ms()
             self.start_dialtone()
 
     def hangup(self):
@@ -305,6 +322,13 @@ class PhoneSimulator:
             else:
                 self.audio_log.append(("dtmf", key))
                 self.number += key
+                # Cap at 10 digits
+                if len(self.number) > 10:
+                    self.play_sfx(self.SFX_BUSY)
+                    self.stop_audio()
+                    self.number = ""
+                    self.start_dialtone()
+                    self.state = self.STATE_OFF_HOOK
         return self.state
 
     def dial_number(self, digits):
@@ -344,6 +368,16 @@ class PhoneSimulator:
     def check_special_code(self):
         """Check if current number is a 3-digit special code."""
         return len(self.number) == 3 and self.number in self.special_codes
+
+    def check_off_hook_timeout(self):
+        """Check if total off-hook time exceeded. Returns True if timed out."""
+        if self.state in (self.STATE_OFF_HOOK, self.STATE_DIALING):
+            if self.utime.ticks_diff(self.utime.ticks_ms(), self.off_hook_start) > self.OFF_HOOK_TIMEOUT:
+                self.stop_audio()
+                self.number = ""
+                self.state = self.STATE_IDLE
+                return True
+        return False
 
     def poem_finished(self):
         """Simulate poem playback finishing."""

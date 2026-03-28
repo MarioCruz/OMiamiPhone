@@ -4,14 +4,22 @@ import time
 class DFPlayer:
     def __init__(self,uart_id,tx_pin_id=None,rx_pin_id=None):
         self.uart_id=uart_id
-        #init with given baudrate
-        self.uart = machine.UART(uart_id, 9600)  
-                
-        #not all boards can set the pins for the uart channel
-        if tx_pin_id or rx_pin_id:
-            self.uart.init(9600, bits=8, parity=None, stop=1, tx=tx_pin_id, rx=rx_pin_id)
+        # Init UART with explicit pins when provided to avoid claiming
+        # default UART1 pins (GP4/GP5), which can conflict with the keypad.
+        if tx_pin_id is not None or rx_pin_id is not None:
+            try:
+                self.uart = machine.UART(
+                    uart_id, 9600, bits=8, parity=None, stop=1,
+                    tx=tx_pin_id, rx=rx_pin_id
+                )
+            except TypeError:
+                # Fallback for older MicroPython builds that don't accept
+                # tx/rx in the constructor.
+                self.uart = machine.UART(uart_id, 9600)
+                self.uart.init(9600, bits=8, parity=None, stop=1,
+                               tx=tx_pin_id, rx=rx_pin_id)
         else:
-            self.uart.init(9600, bits=8, parity=None, stop=1)
+            self.uart = machine.UART(uart_id, 9600, bits=8, parity=None, stop=1)
         
     def flush(self):
         self.uart.flush()
@@ -19,8 +27,7 @@ class DFPlayer:
             self.uart.read()
         
     def send_query(self,cmd,param1=0,param2=0):
-        retry=True
-        while (retry):
+        for _ in range(3):
             self.flush()
             self.send_cmd(cmd,param1,param2)
             time.sleep(0.05)
@@ -28,8 +35,8 @@ class DFPlayer:
             if not in_bytes: #timeout
                 return -1
             if len(in_bytes)==10 and in_bytes[1]==255 and in_bytes[9]==239:
-                retry=False
-        return in_bytes
+                return in_bytes
+        return -1
     
     def send_cmd(self,cmd,param1=0,param2=0):
         out_bytes = bytearray(10)
@@ -89,4 +96,3 @@ class DFPlayer:
         if in_bytes[3]!=78:
             return 0
         return in_bytes[6]
-

@@ -367,3 +367,35 @@ class TestDigitCountBoundaries:
         phone.lift_handset()
         phone.dial_number("3058675309")
         assert len(phone.number) == 10
+
+
+class TestMaxDigits:
+    """Reject input beyond 10 digits — kids mashing buttons."""
+
+    @pytest.fixture
+    def phone(self):
+        return PhoneSimulator(phonebook=PHONEBOOK)
+
+    def test_11_digits_resets_to_off_hook(self, phone):
+        phone.lift_handset()
+        phone.dial_number("86753091234")
+        assert phone.state == phone.STATE_OFF_HOOK
+        assert phone.number == ""
+
+    def test_12_digits_resets_then_continues(self, phone):
+        """After 11 digits triggers reset, remaining digits start a new number."""
+        phone.lift_handset()
+        phone.dial_number("86753091234")  # 11 digits: triggers cap at 11th
+        assert phone.state == phone.STATE_OFF_HOOK
+        # Further digits start fresh
+        phone.dial_key("5")
+        assert phone.number == "5"
+        assert phone.state == phone.STATE_DIALING
+
+    def test_can_dial_after_overflow(self, phone):
+        phone.lift_handset()
+        phone.dial_number("86753091234")  # triggers reset
+        assert phone.state == phone.STATE_OFF_HOOK
+        phone.dial_number("8675309")
+        assert phone.number == "8675309"
+        assert phone.state == phone.STATE_DIALING

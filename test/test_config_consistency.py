@@ -105,13 +105,10 @@ class TestConfigValues:
     def test_no_sfx_number_collisions(self):
         """SFX file numbers and DTMF file numbers must not overlap."""
         cfg = load_config_values()
-        sfx_nums = {
-            cfg["SFX_DIALTONE"], cfg["SFX_RINGBACK"],
-            cfg["SFX_BUSY"], cfg["SFX_HANGUP"],
-            cfg["SFX_OPERATOR"], cfg["SFX_NOT_IN_SERVICE"],
-            cfg.get("SFX_311", 19), cfg.get("SFX_411", 20), cfg.get("SFX_305", 21),
-            cfg.get("SFX_911", 22),
-        }
+        sfx_nums = set()
+        for key, val in cfg.items():
+            if key.startswith("SFX_") and isinstance(val, int):
+                sfx_nums.add(val)
         dtmf_nums = set(cfg["DTMF_FILE"].values())
         overlap = sfx_nums & dtmf_nums
         assert not overlap, f"SFX/DTMF file number collision: {overlap}"
@@ -226,3 +223,121 @@ class TestPinAssignments:
     def test_dfplayer_busy_pin_is_gp17(self):
         cfg = load_config_values()
         assert cfg["DFPLAYER_BUSY"] == 17
+
+
+# =============================================================================
+# SD card file validation
+# =============================================================================
+
+SD_CARD = os.path.join(PROJECT_ROOT, "sd_card")
+
+
+def sd_folder_files(folder_num):
+    """Return set of file numbers (3-digit prefix) found in a folder."""
+    folder = os.path.join(SD_CARD, f"{folder_num:02d}")
+    if not os.path.isdir(folder):
+        return set()
+    nums = set()
+    for f in os.listdir(folder):
+        if f.endswith(".mp3") and len(f) >= 3 and f[:3].isdigit():
+            nums.add(int(f[:3]))
+    return nums
+
+
+class TestSDCardSFX:
+    """Every SFX file number in config.py must have a matching MP3 in sd_card/01/."""
+
+    def test_dialtone_mp3_exists(self):
+        assert 1 in sd_folder_files(1), "Missing 001 (dialtone) in sd_card/01/"
+
+    def test_ringback_mp3_exists(self):
+        assert 2 in sd_folder_files(1), "Missing 002 (ringback) in sd_card/01/"
+
+    def test_busy_mp3_exists(self):
+        assert 3 in sd_folder_files(1), "Missing 003 (busy) in sd_card/01/"
+
+    def test_hangup_mp3_exists(self):
+        assert 4 in sd_folder_files(1), "Missing 004 (hangup) in sd_card/01/"
+
+    def test_all_dtmf_mp3s_exist(self):
+        cfg = load_config_values()
+        files = sd_folder_files(1)
+        for key, num in cfg["DTMF_FILE"].items():
+            assert num in files, f"Missing {num:03d} (DTMF '{key}') in sd_card/01/"
+
+    def test_operator_mp3_exists(self):
+        cfg = load_config_values()
+        assert cfg["SFX_OPERATOR"] in sd_folder_files(1), "Missing operator in sd_card/01/"
+
+    def test_not_in_service_mp3_exists(self):
+        cfg = load_config_values()
+        assert cfg["SFX_NOT_IN_SERVICE"] in sd_folder_files(1), "Missing not_in_service in sd_card/01/"
+
+    def test_all_special_code_sfx_exist(self):
+        """Every SFX_ constant referenced by SPECIAL_CODES must have an MP3."""
+        cfg = load_config_values()
+        files = sd_folder_files(1)
+        special_sfx = {
+            "SFX_311": 19, "SFX_411": 20, "SFX_305": 21, "SFX_911": 22,
+            "SFX_211": 23, "SFX_511": 24, "SFX_711": 25, "SFX_811": 26,
+            "SFX_611": 27,
+        }
+        for name, num in special_sfx.items():
+            actual = cfg.get(name, num)
+            assert actual in files, f"Missing {actual:03d} ({name}) in sd_card/01/"
+
+    def test_all_sfx_files_accounted_for(self):
+        """Every MP3 in sd_card/01/ should be referenced by config."""
+        cfg = load_config_values()
+        referenced = set()
+        for key, val in cfg.items():
+            if key.startswith("SFX_") and isinstance(val, int):
+                referenced.add(val)
+        referenced.update(cfg["DTMF_FILE"].values())
+        on_disk = sd_folder_files(1)
+        orphans = on_disk - referenced
+        assert not orphans, f"Unreferenced files in sd_card/01/: {sorted(orphans)}"
+
+
+class TestSDCardPoems:
+    """Every phonebook entry must have a matching MP3 in sd_card/02/."""
+
+    def test_all_phonebook_mp3s_exist(self):
+        pb = load_phonebook()
+        files = sd_folder_files(2)
+        seen = set()
+        for number, entry in pb.items():
+            file_num = entry["file"]
+            if file_num not in seen:
+                assert file_num in files, (
+                    f"Missing {file_num:03d} ({entry['title']}) in sd_card/02/ "
+                    f"(referenced by {number})"
+                )
+                seen.add(file_num)
+
+    def test_all_poem_files_accounted_for(self):
+        """Every MP3 in sd_card/02/ should be referenced by phonebook."""
+        pb = load_phonebook()
+        referenced = {entry["file"] for entry in pb.values()}
+        on_disk = sd_folder_files(2)
+        orphans = on_disk - referenced
+        assert not orphans, f"Unreferenced files in sd_card/02/: {sorted(orphans)}"
+
+
+class TestSDCardRandomPoems:
+    """sd_card/03/ must have exactly RANDOM_COUNT files numbered 001..N."""
+
+    def test_random_count_matches_files(self):
+        cfg = load_config_values()
+        files = sd_folder_files(3)
+        assert len(files) == cfg["RANDOM_COUNT"], (
+            f"RANDOM_COUNT={cfg['RANDOM_COUNT']} but sd_card/03/ has {len(files)} files"
+        )
+
+    def test_random_files_sequential(self):
+        """Files should be numbered 001 through RANDOM_COUNT with no gaps."""
+        cfg = load_config_values()
+        files = sd_folder_files(3)
+        expected = set(range(1, cfg["RANDOM_COUNT"] + 1))
+        missing = expected - files
+        assert not missing, f"Missing files in sd_card/03/: {sorted(missing)}"
