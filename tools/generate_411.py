@@ -1,78 +1,69 @@
 """
-Generate the 411 directory assistance audio from phonebook.json.
+Generate the 411 directory assistance audio.
 
-Reads all entries and creates an MP3 that reads out each phone number
-and its title, like a real directory assistance operator.
+Uses ElevenLabs TTS (Sarah voice) to create the 411 greeting that
+explains the Banana Poem Phone and hints at Easter eggs.
 
 Usage:
-    pip install gTTS
+    pip install requests
     python generate_411.py
 
 Creates:
     sd_card/01/020_411.mp3
 
-Re-run this whenever you update phonebook.json.
+Re-run this whenever you update the Easter egg list.
 """
 
-import json
 import os
+import requests
 
 
-def format_phone_number(number):
-    """Format 7 digits as spoken words: '8675309' -> '8-6-7-5-3-0-9'."""
-    return ". ".join(list(number))
+ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
+if not ELEVENLABS_API_KEY:
+    raise SystemExit("Set ELEVENLABS_API_KEY environment variable")
+VOICE_ID = "EXAVITQu4vr4xnSDxMaL"  # Sarah
+URL = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
 
-
-def build_script(phonebook):
-    """Build the 411 directory assistance script from phonebook entries."""
-    lines = [
-        "Directory assistance.",
-        "The following numbers are available.",
-    ]
-
-    for number, entry in sorted(phonebook.items()):
-        # Format as "For Jenny, I got your number, dial 8. 6. 7. 5. 3. 0. 9."
-        spoken_number = format_phone_number(number)
-        lines.append(
-            f'For "{entry["title"]}", dial {spoken_number}.'
-        )
-
-    lines.append("For all other numbers, dial any 7 digits for a surprise.")
-    lines.append("Thank you for calling.")
-
-    return " ".join(lines)
-
-
-def generate_with_gtts(text, output_path):
-    """Generate MP3 using Google Text-to-Speech."""
-    from gtts import gTTS
-    tts = gTTS(text=text, lang='en', slow=False)
-    tts.save(output_path)
-    return True
+SCRIPT = (
+    "4-1-1. Directory assistance. "
+    "The Banana Poem Phone was created by Mario The Maker for O'Miami! "
+    "Simply dial any 7-digit number, or 10-digit with area code, to hear a randomly selected poem. "
+    "You never know what you'll get! "
+    "Pro tip: try dialing some famous numbers for fun Easter eggs hidden throughout the experience. "
+    "8-6-7-5-3-0-9... Jenny, by Tommy Tutone. "
+    "5-5-5-2-3-6-8... Ghostbusters. "
+    "3-1-1... non-emergency city services. "
+    "6-1-1... carrier customer service. "
+    "The more you dial, the more surprises you may find! "
+    "Enjoy exploring the Banana Phone, and happy dialing!"
+)
 
 
 def main():
-    # Load phonebook
-    with open("phonebook.json", "r") as f:
-        phonebook = json.load(f)
-
-    script = build_script(phonebook)
-
     print("=== 411 Directory Assistance Script ===\n")
-    print(script)
+    print(SCRIPT)
     print()
 
-    # Generate audio
     output_dir = "sd_card/01"
     os.makedirs(output_dir, exist_ok=True)
     output_path = f"{output_dir}/020_411.mp3"
 
-    try:
-        generate_with_gtts(script, output_path)
-        print(f"Generated: {output_path}")
-    except ImportError:
-        print("gTTS not installed. Install with: pip install gTTS")
-        print("Or record the script above manually as sd_card/01/020_411.mp3")
+    print(f"Generating {output_path} via ElevenLabs (Sarah)...")
+    resp = requests.post(
+        URL,
+        headers={"xi-api-key": ELEVENLABS_API_KEY, "Content-Type": "application/json"},
+        json={
+            "text": SCRIPT,
+            "model_id": "eleven_multilingual_v2",
+            "voice_settings": {"stability": 0.5, "similarity_boost": 0.75, "style": 0.4},
+        },
+    )
+    if resp.status_code == 200:
+        with open(output_path, "wb") as f:
+            f.write(resp.content)
+        print(f"Generated: {output_path} ({len(resp.content)} bytes)")
+    else:
+        print(f"Error {resp.status_code}: {resp.text}")
 
 
 if __name__ == "__main__":

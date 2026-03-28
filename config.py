@@ -40,7 +40,7 @@ KEYMAP = [
 SFX_FOLDER = 1            # Folder 01 on SD card = sound effects
 POEM_FOLDER = 2           # Folder 02 on SD card = poems (mapped by number)
 RANDOM_FOLDER = 3         # Folder 03 on SD card = random poems (unknown numbers)
-RANDOM_COUNT = 5          # How many files in /03/ (update as you add more)
+RANDOM_COUNT = 28         # How many files in /03/ (update as you add more)
 
 # --- Sound Effect File Numbers (in /01/) ---
 SFX_DIALTONE       = 1
@@ -53,6 +53,11 @@ SFX_311            = 19   # 311 — City services
 SFX_411            = 20   # 411 — Directory assistance
 SFX_305            = 21   # 305 — O Miami!
 SFX_911            = 22   # 911 — Emergency redirect
+SFX_211            = 23   # 211 — Community services
+SFX_511            = 24   # 511 — Traffic/road conditions
+SFX_711            = 25   # 711 — Telecommunications relay
+SFX_811            = 26   # 811 — Call before you dig
+SFX_611            = 27   # 611 — Customer service
 
 DTMF_FILE = {
     '0': 5,  '1': 6,  '2': 7,  '3': 8,
@@ -74,9 +79,11 @@ SPECIAL_CODES = {
     "0":   SFX_OPERATOR,
     "311": SFX_311,            # City services
     "411": SFX_411,            # Directory assistance
-    "611": SFX_OPERATOR,
-    "711": SFX_OPERATOR,
-    "811": SFX_OPERATOR,
+    "211": SFX_211,            # Community services
+    "511": SFX_511,            # Traffic/road conditions
+    "611": SFX_611,            # Customer service
+    "711": SFX_711,            # Telecommunications relay
+    "811": SFX_811,            # Call before you dig
     "911": SFX_911,            # Emergency redirect
     "305": SFX_305,            # O Miami!
 }

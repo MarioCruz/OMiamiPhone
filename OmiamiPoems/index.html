@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍌 Banana Poems 2026</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%);
+    min-height: 100vh; padding: 2rem;
+  }
+  .header { text-align: center; margin-bottom: 2rem; }
+  .header h1 { font-size: 2.5rem; color: #92400e; }
+  .header p { color: #a16207; font-size: 1.1rem; margin-top: 0.5rem; }
+  .tabs {
+    display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem;
+  }
+  .tab-btn {
+    padding: 0.75rem 2rem; border: none; border-radius: 2rem;
+    font-size: 1rem; cursor: pointer; font-weight: bold; transition: all 0.3s;
+  }
+  .tab-btn.active { background: #92400e; color: white; }
+  .tab-btn:not(.active) { background: white; color: #92400e; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem; max-width: 1200px; margin: 0 auto;
+  }
+  .poem-card {
+    background: white; border-radius: 1rem; padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08); position: relative;
+  }
+  .poem-card h3 { color: #92400e; margin-bottom: 0.25rem; }
+  .school { color: #a16207; font-size: 0.85rem; display: block; margin-bottom: 0.75rem; }
+  .poem-text {
+    color: #555; line-height: 1.7; margin-bottom: 1rem;
+    font-style: italic; white-space: pre-line;
+  }
+  .badge {
+    position: absolute; top: 1rem; right: 1rem;
+    color: white; padding: 0.25rem 0.75rem; border-radius: 1rem;
+    font-size: 0.75rem; font-weight: bold;
+  }
+  audio { width: 100%; }
+  .play-all {
+    display: block; margin: 0 auto 2rem; padding: 1rem 2.5rem;
+    background: #92400e; color: white; border: none; border-radius: 2rem;
+    font-size: 1.1rem; cursor: pointer; font-weight: bold;
+  }
+  .play-all:hover { background: #78350f; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>🍌 Banana Poems 2026</h1>
+    <p>Listen to poems about bananas, Miami, and life — read aloud with AI voices</p>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('all')">All (29)</button>
+    <button class="tab-btn" onclick="showTab('adult')">Adult (17)</button>
+    <button class="tab-btn" onclick="showTab('kid')">Kid (12)</button>
+  </div>
+  <button class="play-all" onclick="playAll()">▶ Play All</button>
+  <div id="tab-all" class="tab-content active">
+    <div class="grid">
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Ana Martinez</h3>
+          
+          <p class="poem-text">Banana,<br>papaya<br>y<br>mango, fresa, mamey<br>con mucha, mucha azúcar.</p>
+          <audio controls preload="none">
+            <source src="01_Ana_Martinez.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Jenny Munaweera</h3>
+          
+          <p class="poem-text">Banana leaves dancing- <br> sun waking up.<br> It’s <br> just another day in <br> Miami.</p>
+          <audio controls preload="none">
+            <source src="03_Jenny_Munaweera.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Dalila Ulloa</h3>
+          
+          <p class="poem-text">banana suns and <br> dripping dark shadows,<br> the<br> sunrise peaking-<br> feel our moment, our pause in time.</p>
+          <audio controls preload="none">
+            <source src="04_Dalila_Ulloa.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Rachel Northrop</h3>
+          
+          <p class="poem-text">Mango slices con<br> picante, limon, y<br> bachata.<br> Flooded streets, loose chickens,<br> banana trees.</p>
+          <audio controls preload="none">
+            <source src="05_Rachel_Northrop.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Daria Boglaienko</h3>
+          
+          <p class="poem-text">33134:<br><br><br>In Coral Gables,<br>Where I live,<br>Honey<br>Runs in veins<br>Of my inner sun.</p>
+          <audio controls preload="none">
+            <source src="17_Daria_Boglaienko.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Alexandra Fajardo</h3>
+          
+          <p class="poem-text">Near my door<br>I smell home<br>Arepas<br>Tequeños, empanadas, salsa, spanish and chocolate<br>Reminders of somewhere I've lived before</p>
+          <audio controls preload="none">
+            <source src="18_Alexandra_Fajardo.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Neha Rajan</h3>
+          
+          <p class="poem-text">when we walk<br>to the store<br>the sun<br>melds chocolate to my fingers, gold to my eyelashes</p>
+          <audio controls preload="none">
+            <source src="19_Neha_Rajan.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Chantal Bonitto</h3>
+          
+          <p class="poem-text">honey dipped skies<br> avocados swaying high<br> salt.<br> berries painted blue<br> a fruit bowl is inhabited by you.</p>
+          <audio controls preload="none">
+            <source src="20_Chantal_Bonitto.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Isa Murphy</h3>
+          
+          <p class="poem-text">Chocolate cookie dough<br> Marlevous melting marshmallows<br> Chillin!<br> I wanted to work-out,<br> But now I want extra sprinkles</p>
+          <audio controls preload="none">
+            <source src="21_Isa_Murphy.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Nicole Ramirez</h3>
+          
+          <p class="poem-text">The milkshakes and<br> the ice cream;<br> ¯\_(ツ)_/¯<br> nothing can compare<br> to the farms of Homestead.</p>
+          <audio controls preload="none">
+            <source src="22_Nicole_Ramirez.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Mary Beth Loretta</h3>
+          
+          <p class="poem-text">Ice cream trucks<br> Heralded sticky hands<br> And<br> Burnt feet from running on the asphalt<br> Our own world in east Kendall</p>
+          <audio controls preload="none">
+            <source src="23_Mary_Beth_Loretta.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Sofia Hidalgo</h3>
+          
+          <p class="poem-text">I long for<br>a tropical Love<br>rum<br>lime and honey share our secrets<br>saoco dripping down my spine</p>
+          <audio controls preload="none">
+            <source src="24_Sofia_Hidalgo.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Angie Yglesias</h3>
+          
+          <p class="poem-text">O! Knife sharpener --<br>We were hoping<br><br><br>for<br>ice cream.</p>
+          <audio controls preload="none">
+            <source src="25_Angie_Yglesias.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Melissa Metosky</h3>
+          
+          <p class="poem-text">Supposably, people don’t<br>Like the “Miami<br>Accent”<br>Pero like, I think<br>It sounds like honey, bro</p>
+          <audio controls preload="none">
+            <source src="26_Melissa_Metosky.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Eva Geymonat</h3>
+          
+          <p class="poem-text">Night owl  cookies<br>hoot in the<br>night<br>with the<br>perfect melted chocolate chips, the soft texture like hugs</p>
+          <audio controls preload="none">
+            <source src="27_Eva_Geymonat.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Christine Coleau</h3>
+          
+          <p class="poem-text">life is hard<br>but I'm gentle<br><br><br>to myself<br>pouring honey where I once poured salt</p>
+          <audio controls preload="none">
+            <source src="28_Christine_Coleau.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Ariella Berkowitz</h3>
+          
+          <p class="poem-text">For the love<br>Of coconut and<br>passionfruit<br>Meat searing on<br>Charcoal grills, croquetas, ceviches, pubsubs and magic.</p>
+          <audio controls preload="none">
+            <source src="29_Ariella_Berkowitz.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Samantha Desjardins</h3>
+          
+          <p class="poem-text">People taking walks<br> Enjoying the breeze <br> Aromas<br> Surrounded by delicious mango and banana trees<br> The sweet smell makes my mouth water a lot</p>
+          <audio controls preload="none">
+            <source src="02_Samantha_Desjardins.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Urijah Lutin</h3>
+          <span class="school">Hadley</span>
+          <p class="poem-text">Yellow Food<br>A banana as sweet as a sunflower<br>A egg yolk as colorful as the sun<br>Some mustard that's been dripping on my clothes.<br>And I like banana ice cream because it's sweet<br>Colorful as the sun<br>and drippy like mustard.</p>
+          <audio controls preload="none">
+            <source src="06_Urijah_Lutin.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Ericka</h3>
+          
+          <p class="poem-text">The Banana<br><br><br>that is shaped like a phone<br><br><br>that is so bright, it’ll shine the night<br><br><br>that smells like the beautiful sunflower<br><br><br>it has dots, as if it had freckles<br><br><br>it has skin covering the delicious fruit<br><br><br>it is fresh and ripe<br><br><br>the banana is rolling through the city, <br>looking for a stomach<br><br><br>but it still remains a ripe and lonely banana</p>
+          <audio controls preload="none">
+            <source src="07_Ericka.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Jenmer Noesi</h3>
+          <span class="school">Morningside</span>
+          <p class="poem-text">When I feel a banana, I feel like I'm touching a wooden desk. <br> <br>When I smell a banana, I have this weird dim and stale smell <br> <br>When I see a banana, I think about the moon as a crescent shape <br> <br>When I hear a banana, I hear silence <br> <br>When I taste a banana, I have this sugary and tasty taste</p>
+          <audio controls preload="none">
+            <source src="08_Jenmer_Noesi.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Nicholas DAquilante</h3>
+          <span class="school">Fienberg-Fisher</span>
+          <p class="poem-text">Bananas<br><br><br>If I were a banana<br>I would grow in gardens each day<br>The big yellow color you see<br>The big shine and very pleasing to eat<br><br><br>If I were a banana<br>I would be fresh<br>With the big color of yellow<br>That shines up everyday</p>
+          <audio controls preload="none">
+            <source src="09_Nicholas_DAquilante.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Stella Karim</h3>
+          <span class="school">CGE</span>
+          <p class="poem-text">"???"<br>Bright like sunlight<br>puts a smile on my face<br>sour like a lemon<br>sweet like a banana<br>iluminación<br>boom bright big wow<br>wonderful color crazy<br>wow how I love it so much.</p>
+          <audio controls preload="none">
+            <source src="10_Stella_Karim.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Alvarado Cuevas, Danny B. ("Jackson")</h3>
+          <span class="school">Morningside</span>
+          <p class="poem-text">Crumbling<br><br><br>The bananas falling down.<br>The summer like flowers blooming up.<br>The sun that goes up.</p>
+          <audio controls preload="none">
+            <source src="11_Alvarado_Cuevas_Danny_B_Jackson.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Matthew Gudiel</h3>
+          <span class="school">Morningside</span>
+          <p class="poem-text">a banana is the shape of the moon<br> it could be yellow or brown<br>it could be a nice ice cream sunday<br>to me it is delicioso<br><br><br>NO NAME< matthew? <br>A yellow crescent<br>like a moon, could be quite decent<br>with small black seeds, it;s soft.<br>ir doesnt sound or smell like antthing.<br>kind of sweet, especially in a dessert. a nice tasty sweet treat.</p>
+          <audio controls preload="none">
+            <source src="12_Matthew_Gudiel.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Mikayla Jones</h3>
+          <span class="school">Gibson</span>
+          <p class="poem-text">(Yellow) <br>A banana peel open on the floor<br>an egg yolk in a white bowl<br>a star bright on a dark night<br>a sunflower in a freshly planted garden<br>a hibiscus as bright as the sun<br>a dandelion like a Laffy Taffy<br>a freshly squeezed lemon<br>as bright as a pencil<br>as bright as my friend's attitude<br>a sunny day and the banana colored flowers<br>the color yellow is everywhere<br>all around you<br>here and there</p>
+          <audio controls preload="none">
+            <source src="13_Mikayla_Jones.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Vanessa Gil</h3>
+          <span class="school">Emerson Elementary</span>
+          <p class="poem-text">I love bananas<br>so much.<br> <br>I eat it with pancakes.<br>It is yellow.<br> <br>It is so squishy<br>and in the inside<br>it is white<br>and in the outside<br>it is yellow.<br> <br>It is<br>like the<br>clouds.<br> <br>It smells<br>bad.<br> <br>It tastes like<br>heaven.</p>
+          <audio controls preload="none">
+            <source src="14_Vanessa_Gil.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Adalynn Milan</h3>
+          <span class="school">Emerson Elementary</span>
+          <p class="poem-text">Life is a banana. Life is only yellow.<br>It is not round it is shaped like a banana.<br>Once, my friend Analia took a bite out<br>of the world. She loved it.</p>
+          <audio controls preload="none">
+            <source src="15_Adalynn_Milan.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Geanna Daniel</h3>
+          <span class="school">Morningside</span>
+          <p class="poem-text">O, banana you are so yellow<br>You remind me of the sun <br>O, banana I wish you were here  <br>I will eat you in my tummy<br>O, banana you’re so cute <br>I like you more than the others</p>
+          <audio controls preload="none">
+            <source src="16_Geanna_Daniel.mp3" type="audio/mpeg">
+          </audio>
+        </div></div>
+  </div>
+  <div id="tab-adult" class="tab-content">
+    <div class="grid">
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Ana Martinez</h3>
+          
+          <p class="poem-text">Banana,<br>papaya<br>y<br>mango, fresa, mamey<br>con mucha, mucha azúcar.</p>
+          <audio controls preload="none">
+            <source src="01_Ana_Martinez.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Jenny Munaweera</h3>
+          
+          <p class="poem-text">Banana leaves dancing- <br> sun waking up.<br> It’s <br> just another day in <br> Miami.</p>
+          <audio controls preload="none">
+            <source src="03_Jenny_Munaweera.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Dalila Ulloa</h3>
+          
+          <p class="poem-text">banana suns and <br> dripping dark shadows,<br> the<br> sunrise peaking-<br> feel our moment, our pause in time.</p>
+          <audio controls preload="none">
+            <source src="04_Dalila_Ulloa.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Rachel Northrop</h3>
+          
+          <p class="poem-text">Mango slices con<br> picante, limon, y<br> bachata.<br> Flooded streets, loose chickens,<br> banana trees.</p>
+          <audio controls preload="none">
+            <source src="05_Rachel_Northrop.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Daria Boglaienko</h3>
+          
+          <p class="poem-text">33134:<br><br><br>In Coral Gables,<br>Where I live,<br>Honey<br>Runs in veins<br>Of my inner sun.</p>
+          <audio controls preload="none">
+            <source src="17_Daria_Boglaienko.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Alexandra Fajardo</h3>
+          
+          <p class="poem-text">Near my door<br>I smell home<br>Arepas<br>Tequeños, empanadas, salsa, spanish and chocolate<br>Reminders of somewhere I've lived before</p>
+          <audio controls preload="none">
+            <source src="18_Alexandra_Fajardo.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Neha Rajan</h3>
+          
+          <p class="poem-text">when we walk<br>to the store<br>the sun<br>melds chocolate to my fingers, gold to my eyelashes</p>
+          <audio controls preload="none">
+            <source src="19_Neha_Rajan.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Chantal Bonitto</h3>
+          
+          <p class="poem-text">honey dipped skies<br> avocados swaying high<br> salt.<br> berries painted blue<br> a fruit bowl is inhabited by you.</p>
+          <audio controls preload="none">
+            <source src="20_Chantal_Bonitto.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Isa Murphy</h3>
+          
+          <p class="poem-text">Chocolate cookie dough<br> Marlevous melting marshmallows<br> Chillin!<br> I wanted to work-out,<br> But now I want extra sprinkles</p>
+          <audio controls preload="none">
+            <source src="21_Isa_Murphy.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Nicole Ramirez</h3>
+          
+          <p class="poem-text">The milkshakes and<br> the ice cream;<br> ¯\_(ツ)_/¯<br> nothing can compare<br> to the farms of Homestead.</p>
+          <audio controls preload="none">
+            <source src="22_Nicole_Ramirez.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Mary Beth Loretta</h3>
+          
+          <p class="poem-text">Ice cream trucks<br> Heralded sticky hands<br> And<br> Burnt feet from running on the asphalt<br> Our own world in east Kendall</p>
+          <audio controls preload="none">
+            <source src="23_Mary_Beth_Loretta.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Sofia Hidalgo</h3>
+          
+          <p class="poem-text">I long for<br>a tropical Love<br>rum<br>lime and honey share our secrets<br>saoco dripping down my spine</p>
+          <audio controls preload="none">
+            <source src="24_Sofia_Hidalgo.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Angie Yglesias</h3>
+          
+          <p class="poem-text">O! Knife sharpener --<br>We were hoping<br><br><br>for<br>ice cream.</p>
+          <audio controls preload="none">
+            <source src="25_Angie_Yglesias.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Melissa Metosky</h3>
+          
+          <p class="poem-text">Supposably, people don’t<br>Like the “Miami<br>Accent”<br>Pero like, I think<br>It sounds like honey, bro</p>
+          <audio controls preload="none">
+            <source src="26_Melissa_Metosky.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Eva Geymonat</h3>
+          
+          <p class="poem-text">Night owl  cookies<br>hoot in the<br>night<br>with the<br>perfect melted chocolate chips, the soft texture like hugs</p>
+          <audio controls preload="none">
+            <source src="27_Eva_Geymonat.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Christine Coleau</h3>
+          
+          <p class="poem-text">life is hard<br>but I'm gentle<br><br><br>to myself<br>pouring honey where I once poured salt</p>
+          <audio controls preload="none">
+            <source src="28_Christine_Coleau.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#f59e0b">Adult</span>
+          <h3>🍌 Ariella Berkowitz</h3>
+          
+          <p class="poem-text">For the love<br>Of coconut and<br>passionfruit<br>Meat searing on<br>Charcoal grills, croquetas, ceviches, pubsubs and magic.</p>
+          <audio controls preload="none">
+            <source src="29_Ariella_Berkowitz.mp3" type="audio/mpeg">
+          </audio>
+        </div></div>
+  </div>
+  <div id="tab-kid" class="tab-content">
+    <div class="grid">
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Samantha Desjardins</h3>
+          
+          <p class="poem-text">People taking walks<br> Enjoying the breeze <br> Aromas<br> Surrounded by delicious mango and banana trees<br> The sweet smell makes my mouth water a lot</p>
+          <audio controls preload="none">
+            <source src="02_Samantha_Desjardins.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Urijah Lutin</h3>
+          <span class="school">Hadley</span>
+          <p class="poem-text">Yellow Food<br>A banana as sweet as a sunflower<br>A egg yolk as colorful as the sun<br>Some mustard that's been dripping on my clothes.<br>And I like banana ice cream because it's sweet<br>Colorful as the sun<br>and drippy like mustard.</p>
+          <audio controls preload="none">
+            <source src="06_Urijah_Lutin.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Ericka</h3>
+          
+          <p class="poem-text">The Banana<br><br><br>that is shaped like a phone<br><br><br>that is so bright, it’ll shine the night<br><br><br>that smells like the beautiful sunflower<br><br><br>it has dots, as if it had freckles<br><br><br>it has skin covering the delicious fruit<br><br><br>it is fresh and ripe<br><br><br>the banana is rolling through the city, <br>looking for a stomach<br><br><br>but it still remains a ripe and lonely banana</p>
+          <audio controls preload="none">
+            <source src="07_Ericka.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Jenmer Noesi</h3>
+          <span class="school">Morningside</span>
+          <p class="poem-text">When I feel a banana, I feel like I'm touching a wooden desk. <br> <br>When I smell a banana, I have this weird dim and stale smell <br> <br>When I see a banana, I think about the moon as a crescent shape <br> <br>When I hear a banana, I hear silence <br> <br>When I taste a banana, I have this sugary and tasty taste</p>
+          <audio controls preload="none">
+            <source src="08_Jenmer_Noesi.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Nicholas DAquilante</h3>
+          <span class="school">Fienberg-Fisher</span>
+          <p class="poem-text">Bananas<br><br><br>If I were a banana<br>I would grow in gardens each day<br>The big yellow color you see<br>The big shine and very pleasing to eat<br><br><br>If I were a banana<br>I would be fresh<br>With the big color of yellow<br>That shines up everyday</p>
+          <audio controls preload="none">
+            <source src="09_Nicholas_DAquilante.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Stella Karim</h3>
+          <span class="school">CGE</span>
+          <p class="poem-text">"???"<br>Bright like sunlight<br>puts a smile on my face<br>sour like a lemon<br>sweet like a banana<br>iluminación<br>boom bright big wow<br>wonderful color crazy<br>wow how I love it so much.</p>
+          <audio controls preload="none">
+            <source src="10_Stella_Karim.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Alvarado Cuevas, Danny B. ("Jackson")</h3>
+          <span class="school">Morningside</span>
+          <p class="poem-text">Crumbling<br><br><br>The bananas falling down.<br>The summer like flowers blooming up.<br>The sun that goes up.</p>
+          <audio controls preload="none">
+            <source src="11_Alvarado_Cuevas_Danny_B_Jackson.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Matthew Gudiel</h3>
+          <span class="school">Morningside</span>
+          <p class="poem-text">a banana is the shape of the moon<br> it could be yellow or brown<br>it could be a nice ice cream sunday<br>to me it is delicioso<br><br><br>NO NAME< matthew? <br>A yellow crescent<br>like a moon, could be quite decent<br>with small black seeds, it;s soft.<br>ir doesnt sound or smell like antthing.<br>kind of sweet, especially in a dessert. a nice tasty sweet treat.</p>
+          <audio controls preload="none">
+            <source src="12_Matthew_Gudiel.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Mikayla Jones</h3>
+          <span class="school">Gibson</span>
+          <p class="poem-text">(Yellow) <br>A banana peel open on the floor<br>an egg yolk in a white bowl<br>a star bright on a dark night<br>a sunflower in a freshly planted garden<br>a hibiscus as bright as the sun<br>a dandelion like a Laffy Taffy<br>a freshly squeezed lemon<br>as bright as a pencil<br>as bright as my friend's attitude<br>a sunny day and the banana colored flowers<br>the color yellow is everywhere<br>all around you<br>here and there</p>
+          <audio controls preload="none">
+            <source src="13_Mikayla_Jones.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Vanessa Gil</h3>
+          <span class="school">Emerson Elementary</span>
+          <p class="poem-text">I love bananas<br>so much.<br> <br>I eat it with pancakes.<br>It is yellow.<br> <br>It is so squishy<br>and in the inside<br>it is white<br>and in the outside<br>it is yellow.<br> <br>It is<br>like the<br>clouds.<br> <br>It smells<br>bad.<br> <br>It tastes like<br>heaven.</p>
+          <audio controls preload="none">
+            <source src="14_Vanessa_Gil.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Adalynn Milan</h3>
+          <span class="school">Emerson Elementary</span>
+          <p class="poem-text">Life is a banana. Life is only yellow.<br>It is not round it is shaped like a banana.<br>Once, my friend Analia took a bite out<br>of the world. She loved it.</p>
+          <audio controls preload="none">
+            <source src="15_Adalynn_Milan.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <div class="poem-card">
+          <span class="badge" style="background:#10b981">Kids</span>
+          <h3>🍌 Geanna Daniel</h3>
+          <span class="school">Morningside</span>
+          <p class="poem-text">O, banana you are so yellow<br>You remind me of the sun <br>O, banana I wish you were here  <br>I will eat you in my tummy<br>O, banana you’re so cute <br>I like you more than the others</p>
+          <audio controls preload="none">
+            <source src="16_Geanna_Daniel.mp3" type="audio/mpeg">
+          </audio>
+        </div></div>
+  </div>
+  <script>
+    function showTab(name) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      event.target.classList.add('active');
+    }
+    function playAll() {
+      const active = document.querySelector('.tab-content.active');
+      const audios = active.querySelectorAll('audio');
+      let i = 0;
+      function playNext() {
+        if (i < audios.length) {
+          audios[i].play();
+          audios[i].onended = () => { i++; playNext(); };
+          audios[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+      playNext();
+    }
+  </script>
+</body>
+</html>

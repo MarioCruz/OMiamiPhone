@@ -6,8 +6,7 @@ __pycache__/
 dist/
 build/
 
-# Generated audio files (regenerate with: python generate_tones.py)
-sd_card/
+# (sd_card/ is tracked — full SD card backup for the phone)
 
 # macOS
 .DS_Store
@@ -25,3 +24,11 @@ sd_card/
 # Environment
 .env
 venv/
+
+# Claude Code
+.claude/
+
+# macOS SD card artifacts
+.Spotlight-V100
+.Trashes
+.fseventsd

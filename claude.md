@@ -19,8 +19,8 @@ Art installation phone for O Miami poetry festival. Dial a number on a real phon
 
 ## GPIO Wiring
 
-- Keypad columns (outputs): GP0, GP1, GP2
-- Keypad rows (inputs, pull-up): GP6 (top), GP5, GP7, GP3 (bottom)
+- Keypad columns (outputs): GP6, GP5, GP7
+- Keypad rows (inputs, pull-up): GP4 (top), GP2, GP1, GP0 (bottom)
 - Hook switch: GP22 (NO switch, pull-up, LOW = on-hook, HIGH = off-hook)
 - DFPlayer TX: GP20 (via 1K resistor to DFPlayer RX)
 - DFPlayer RX: GP21 (direct from DFPlayer TX)
@@ -68,9 +68,9 @@ Run tests: `pytest test/ -v`
 
 ## Keypad Wiring
 
-- Columns (outputs): GP0, GP1, GP2
-- Rows (inputs, pull-up): GP6 (top), GP5, GP7, GP3 (bottom)
-- Bottom row (GP3: *, 0, #) is noisy — needs aggressive debounce
+- Columns (outputs): GP6, GP5, GP7
+- Rows (inputs, pull-up): GP4 (top), GP2, GP1, GP0 (bottom)
+- Bottom row (GP0: *, 0, #) may be noisy — needs aggressive debounce
 - Debounce: 5 stable reads to accept, 5 clean reads + 30ms to release
 
 ## DFPlayer Notes
@@ -89,24 +89,29 @@ Run tests: `pytest test/ -v`
 
 ## Hardware Status
 
-- Keypad: wired and working (GP0-GP3, GP5-GP7)
+- Keypad: wired and working (GP0-GP2, GP4-GP7)
 - DFPlayer: wired and working (UART1 on GP20/GP21, BUSY on GP17, 5V from VBUS)
 - Hook switch: wired and working (GP22, normally-open, LOW = off-hook)
 - SD card: loaded — /01/ SFX (22 files), /02/ empty (mapped poems), /03/ random poems (5 files)
 
 ## Keypad Discovery (Historical)
 
-Used `keypad_probe.py` to brute-force every pin pair. Results:
+Used `keypad_probe_8wire.py` to brute-force every pin pair on the new phone. Results:
 
 | Key | Pin A | Pin B |
 |-----|-------|-------|
-| 0   | GP1   | GP3   |
-| 1   | GP0   | GP6   |
-| 2   | GP1   | GP6   |
-| 3   | GP2   | GP6   |
-| 4   | GP0   | GP5   |
-| 7   | GP0   | GP7   |
-| *   | GP0   | GP3   |
+| 1   | GP4   | GP6   |
+| 2   | GP4   | GP5   |
+| 3   | GP4   | GP7   |
+| 4   | GP2   | GP6   |
+| 5   | GP2   | GP5   |
+| 6   | GP2   | GP7   |
+| 7   | GP1   | GP6   |
+| 8   | GP1   | GP5   |
+| 9   | GP1   | GP7   |
+| *   | GP0   | GP6   |
+| 0   | GP0   | GP5   |
+| #   | GP0   | GP7   |
 
 ## What Didn't Work
 

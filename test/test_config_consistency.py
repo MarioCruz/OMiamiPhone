@@ -129,10 +129,10 @@ class TestPhonebook:
         pb = load_phonebook()
         assert isinstance(pb, dict)
 
-    def test_all_keys_are_7_digits(self):
+    def test_all_keys_are_7_or_10_digits(self):
         pb = load_phonebook()
         for key in pb:
-            assert len(key) == 7, f"Key '{key}' is not 7 digits"
+            assert len(key) in (7, 10), f"Key '{key}' is not 7 or 10 digits"
             assert key.isdigit(), f"Key '{key}' contains non-digits"
 
     def test_all_entries_have_file(self):
@@ -148,10 +148,10 @@ class TestPhonebook:
             assert isinstance(entry["title"], str)
             assert len(entry["title"]) > 0
 
-    def test_file_numbers_are_unique(self):
+    def test_file_numbers_are_valid(self):
         pb = load_phonebook()
-        files = [e["file"] for e in pb.values()]
-        assert len(files) == len(set(files)), "Duplicate file numbers in phonebook"
+        for key, entry in pb.items():
+            assert entry["file"] >= 1, f"Entry '{key}' has invalid file number"
 
     def test_file_numbers_start_at_1(self):
         pb = load_phonebook()
