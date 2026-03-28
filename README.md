@@ -21,6 +21,9 @@ Built with a Raspberry Pi Pico, DFPlayer Mini MP3 module, and a salvaged phone h
 | **867-5309** | Jenny Munaweera's poem (Tommy Tutone!) |
 | **305-867-5309** | Same — area code gets stripped |
 | **555-2368** | "Who are you going to call?... A poet?" (Ghostbusters) |
+| **555-1212** | Ericka's poem (classic directory assistance number) |
+| **324-8811** | "Poetry Time" — Miami's old time-of-day number, poetry edition |
+| **777-3456** | "Poemafone" — Moviefone parody feat. P. Scott Cunningham in *A Poet Stuck in Chicago* |
 | **411** | Directory assistance — explains the phone and hints at Easter eggs |
 | **305** | O'Miami shoutout |
 | **0** | Operator |
@@ -201,9 +204,12 @@ sd_card/
 │   ├── 026_811.mp3
 │   └── 027_611.mp3
 │
-├── 02/                           ← Mapped poems (2 files)
+├── 02/                           ← Mapped poems (5 files)
 │   ├── 001_Jenny_Munaweera.mp3   ← 867-5309
-│   └── 002_ghostbusters.mp3      ← 555-2368
+│   ├── 002_ghostbusters.mp3      ← 555-2368
+│   ├── 003_Ericka.mp3            ← 555-1212
+│   ├── 004_poetry_time.mp3       ← 324-8811
+│   └── 005_moviefone.mp3         ← 777-3456
 │
 └── 03/                           ← Random O'Miami poems (28 files)
     ├── 001_Ana_Martinez.mp3
@@ -252,7 +258,29 @@ Run the test suite:
 pytest test/ -v
 ```
 
-145 tests across 5 test files. Mock framework in `test/mock_micropython.py` uses AST parser to avoid MicroPython imports.
+169 tests across 7 test files. Mock framework in `test/mock_micropython.py` uses AST parser to avoid MicroPython imports.
+
+## Known Gotcha: UART1 Default Pins Kill the Keypad
+
+The hardest bug in this project: the keypad would intermittently stop working after boot, but manually restarting the script often "fixed" it.
+
+**Root cause**: `machine.UART(1, 9600)` without explicit `tx`/`rx` parameters momentarily claims GP4 and GP5 — the UART1 default pins on RP2040 — even when you immediately call `.init()` with GP20/GP21. GP4 is keypad row 0, GP5 is keypad column 1. The brief pin reconfiguration during DFPlayer init corrupted the keypad GPIO state.
+
+**Fix**: Always pass `tx=pin, rx=pin` in the `machine.UART()` constructor. The `dfplayer.py` library was patched to do this. If you're using UART on RP2040 and some GPIO pins stop working, check if UART init is silently claiming its default pins.
+
+## Robustness Features
+
+Built to survive kids at an art festival:
+
+- **Watchdog timer** — auto-reboots the Pico if the main loop hangs for 8 seconds
+- **Crash recovery** — any unhandled exception resets to idle and continues running
+- **Off-hook timeout** — 2 minutes max, then the phone goes silent until hangup + relift
+- **Dialing timeout** — 8 seconds between digits, then busy signal and reset
+- **Stuck key protection** — key held for 2 seconds resets to dial tone
+- **Debounced hangup** — 3 consecutive reads required to prevent false triggers from slammed handsets
+- **Heartbeat LED** — GP25 blinks every loop iteration (blinking = alive)
+- **Boot chime** — 500ms dial tone on startup so you hear it come alive
+- **Memory management** — `gc.collect()` every loop to prevent heap fragmentation
 
 ## Files
 
