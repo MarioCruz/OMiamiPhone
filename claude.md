@@ -66,7 +66,7 @@ The `sd_card/` directory is the complete image of what goes on the DFPlayer's mi
 | Folder | Files | Purpose |
 |--------|-------|---------|
 | `/01/` | 27 | Sound effects (dial tone, DTMF, ringback, busy, operator, special codes) |
-| `/02/` | 2 | Mapped poems (phonebook entries with specific numbers) |
+| `/02/` | 5 | Mapped poems (phonebook entries with specific numbers) |
 | `/03/` | 28 | Random poems (played for any unrecognized number) |
 
 To update the SD card:
@@ -85,6 +85,9 @@ Numbers mapped to specific audio in `phonebook.json`:
 |--------|----------|-------|------|
 | 867-5309 | 305-867-5309 | Jenny Munaweera poem | `/02/001` |
 | 555-2368 | — | "Who are you going to call? A poet?" (Ghostbusters) | `/02/002` |
+| 555-1212 | 305-555-1212 | Ericka poem (classic directory assistance) | `/02/003` |
+| 324-8811 | 305-324-8811 | "Poetry Time" (Miami's old time-of-day number) | `/02/004` |
+| 777-3456 | 305-777-3456 | "Poemafone" (Moviefone parody, P. Scott Cunningham) | `/02/005` |
 
 All other 7-digit (or 10-digit with area code) numbers play a random poem from `/03/`.
 
@@ -117,7 +120,7 @@ Dialing these short codes plays a dedicated SFX from `/01/`:
 
 Run tests: `pytest test/ -v`
 
-145 tests across 5 test files. Mock framework in `test/mock_micropython.py` uses AST parser to avoid MicroPython imports.
+169 tests across 7 test files. Mock framework in `test/mock_micropython.py` uses AST parser to avoid MicroPython imports. Tests cover state machine logic, hook switch, dialing edge cases, audio sequencing, config/SD card consistency, off-hook timeout, and crash recovery.
 
 ## Keypad Wiring
 
@@ -145,11 +148,12 @@ Run tests: `pytest test/ -v`
 - Keypad: wired and working (GP0-GP2, GP4-GP7)
 - DFPlayer: wired and working (UART1 on GP20/GP21, BUSY on GP17, 5V from VBUS)
 - Hook switch: wired and working (GP22, normally-open, LOW = off-hook)
-- SD card: loaded — /01/ SFX (27 files), /02/ mapped poems (2 files), /03/ random poems (28 files)
+- SD card: loaded — /01/ SFX (27 files), /02/ mapped poems (5 files), /03/ random poems (28 files)
 
 ## GPIO Gotchas
 
-- **GP4 vs UART1**: GP4 is an alternate UART1 TX pin on RP2040. It stops working as GPIO input when UART1 is initialized on GP20/GP21. Originally used for keypad row 2 — moved to GP7.
+- **GP4/GP5 vs UART1 default pins (THE BIG BUG)**: `machine.UART(1, 9600)` without explicit `tx`/`rx` params momentarily claims GP4 and GP5 — the UART1 default pins on RP2040 — even if you call `.init()` with different pins afterward. GP4 is keypad row 0 and GP5 is keypad column 1. This caused the keypad to intermittently fail on boot: sometimes keys worked, sometimes they didn't, and manually stopping/starting the script often "fixed" it because the pins re-initialized in a different order. **Fix**: Always pass `tx=pin, rx=pin` directly in the `machine.UART()` constructor so the default pins are never touched. The dfplayer.py library was patched to do this.
+- **GP4 vs UART1 alternate function**: GP4 is an alternate UART1 TX pin on RP2040. Even after fixing the constructor, GP4 can still misbehave if UART1 is initialized without explicit pins. This is why keypad row 2 was originally on GP4 and had to stay there carefully.
 - **GP16 vs UART0**: GP16 had issues as BUSY pin input. Moved to GP17.
 - **Non-contiguous pins**: Keypad rows use GP4, GP2, GP1, GP0 (not GP0-GP3) due to the GP4/UART1 conflict.
 
