@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Art installation phone for O Miami poetry festival. Dial a number on a real phone keypad, hear ringing, then listen to a poem through the earpiece. Built on Raspberry Pi Pico + DFPlayer Mini + salvaged phone handset.
+Art installation phone for O Miami poetry festival. Dial a number on a real phone keypad, hear ringing, then listen to a poem through the earpiece. Built on Raspberry Pi Pico + DFPlayer Mini + salvaged phone handset. Created by Mario The Maker.
 
 ## Repo
 
@@ -28,11 +28,9 @@ Art installation phone for O Miami poetry festival. Dial a number on a real phon
 
 ## Deploy Commands
 
+Deploy all 4 files to Pico:
 ```bash
-mpremote connect /dev/cu.usbmodem1101 cp config.py :config.py
-mpremote connect /dev/cu.usbmodem1101 cp dfplayer.py :dfplayer.py
-mpremote connect /dev/cu.usbmodem1101 cp phonebook.json :phonebook.json
-mpremote connect /dev/cu.usbmodem1101 cp poetry_phone.py :main.py
+mpremote connect /dev/cu.usbmodem1101 cp config.py :config.py + cp phonebook.json :phonebook.json + cp poetry_phone.py :main.py + cp dfplayer.py :dfplayer.py
 ```
 
 To run without rebooting:
@@ -51,14 +49,69 @@ Only 4 files deployed: `config.py`, `dfplayer.py`, `main.py` (from poetry_phone.
 | `poetry_phone.py` | `:main.py` | Main state machine |
 | `config.py` | `:config.py` | All settings (pins, timing, volume, special codes) |
 | `dfplayer.py` | `:dfplayer.py` | DFPlayer Mini library (redoxcode) |
-| `phonebook.json` | `:phonebook.json` | Phone number → poem mappings (4 entries) |
+| `phonebook.json` | `:phonebook.json` | Phone number → poem mappings (3 entries) |
 | `tools/` | No | Desktop scripts (generators, keypad discovery, etc.) |
 | `SPEC.md` | No | Full hardware/software specification |
 | `SHOPPING.md` | No | Shopping list (extracted from SPEC.md) |
 | `USER_GUIDE.md` | No | How to add/remove poems and manage the SD card |
 | `test/` | No | 145 pytest tests with MicroPython mock framework |
 | `hardware_test/` | No | Hardware validation scripts (dfplayer_test, hook_test, busy_test, uart_probe, etc.) |
-| `Poems/` | No | Original poem MP3 source files (copied to sd_card/03/ with DFPlayer naming) |
+| `OmiamiPoems/` | No | Source O'Miami poem MP3s (29 poems + index.html) |
+| `sd_card/` | SD card | Full SD card image — tracked in git as backup |
+
+## SD Card Layout
+
+The `sd_card/` directory is the complete image of what goes on the DFPlayer's microSD card. It is tracked in git so the full phone can be recreated if the SD card is lost.
+
+| Folder | Files | Purpose |
+|--------|-------|---------|
+| `/01/` | 27 | Sound effects (dial tone, DTMF, ringback, busy, operator, special codes) |
+| `/02/` | 2 | Mapped poems (phonebook entries with specific numbers) |
+| `/03/` | 28 | Random poems (played for any unrecognized number) |
+
+To update the SD card:
+```bash
+cp sd_card/01/*.mp3 /Volumes/<SDCARD>/01/
+cp sd_card/02/*.mp3 /Volumes/<SDCARD>/02/
+cp sd_card/03/*.mp3 /Volumes/<SDCARD>/03/
+dot_clean /Volumes/<SDCARD>
+```
+
+## Phonebook (Easter Eggs)
+
+Numbers mapped to specific audio in `phonebook.json`:
+
+| Number | Also via | Audio | File |
+|--------|----------|-------|------|
+| 867-5309 | 305-867-5309 | Jenny Munaweera poem | `/02/001` |
+| 555-2368 | — | "Who are you going to call? A poet?" (Ghostbusters) | `/02/002` |
+
+All other 7-digit (or 10-digit with area code) numbers play a random poem from `/03/`.
+
+## Special Codes (3-digit)
+
+Dialing these short codes plays a dedicated SFX from `/01/`:
+
+| Code | SFX# | Description |
+|------|------|-------------|
+| 0 | 17 | Operator — "This is the Banana Poem Phone..." |
+| 211 | 23 | Community services — poetic Miami message |
+| 311 | 19 | City services |
+| 411 | 20 | Directory assistance — explains the phone, lists Easter eggs |
+| 511 | 24 | Traffic — "Every road in Miami leads to the ocean..." |
+| 611 | 27 | Customer service — "All representatives are busy reading poetry..." |
+| 711 | 25 | Telecom relay — "Every voice deserves to be heard..." |
+| 811 | 26 | Utility locator — "Call before you dig... beneath every poem, a tangle of feelings" |
+| 911 | 22 | Emergency redirect — "This is not a real phone, dial 911 on a real phone" |
+| 305 | 21 | O'Miami — Miami area code shoutout, credits Mario The Maker |
+
+## Audio Generation
+
+- **SFX voice messages** (operator, special codes): Generated with ElevenLabs TTS, Sarah voice, `eleven_multilingual_v2` model
+- **Poem audio** (`OmiamiPoems/`): Generated with ElevenLabs TTS, multiple voices (Sarah, Chris, Jessica, Liam) matched by poem type and poet gender
+- **Dial/DTMF tones**: Generated with `tools/generate_tones.py` (pure synthesis)
+- **411 directory**: Regenerate with `tools/generate_411.py` (requires `ELEVENLABS_API_KEY` env var)
+- API key is NOT stored in the repo — set `ELEVENLABS_API_KEY` env var when regenerating
 
 ## Test Suite
 
@@ -92,7 +145,13 @@ Run tests: `pytest test/ -v`
 - Keypad: wired and working (GP0-GP2, GP4-GP7)
 - DFPlayer: wired and working (UART1 on GP20/GP21, BUSY on GP17, 5V from VBUS)
 - Hook switch: wired and working (GP22, normally-open, LOW = off-hook)
-- SD card: loaded — /01/ SFX (22 files), /02/ empty (mapped poems), /03/ random poems (5 files)
+- SD card: loaded — /01/ SFX (27 files), /02/ mapped poems (2 files), /03/ random poems (28 files)
+
+## GPIO Gotchas
+
+- **GP4 vs UART1**: GP4 is an alternate UART1 TX pin on RP2040. It stops working as GPIO input when UART1 is initialized on GP20/GP21. Originally used for keypad row 2 — moved to GP7.
+- **GP16 vs UART0**: GP16 had issues as BUSY pin input. Moved to GP17.
+- **Non-contiguous pins**: Keypad rows use GP4, GP2, GP1, GP0 (not GP0-GP3) due to the GP4/UART1 conflict.
 
 ## Keypad Discovery (Historical)
 
@@ -115,6 +174,9 @@ Used `keypad_probe_8wire.py` to brute-force every pin pair on the new phone. Res
 
 ## What Didn't Work
 
-- 7-pin config (GP0–GP6) — lost the bottom row entirely
+- 7-pin config (GP0-GP6) — lost the bottom row entirely
 - Simple debounce (single clean read) — bottom row keys fired multiple times
 - `mpremote run` with timeout — leaves serial port locked, need unplug/replug
+- `is_playing()` on DFPlayer clone — always returns `-1`, use BUSY pin instead
+- GP4 for keypad row when UART1 active — alternate function conflict on RP2040
+- GP16 for BUSY pin — unreliable, moved to GP17
