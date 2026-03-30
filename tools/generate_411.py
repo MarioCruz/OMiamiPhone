@@ -26,7 +26,7 @@ URL = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
 
 SCRIPT = (
     "4-1-1. Directory assistance. "
-    "The Banana Poem Phone was created by Mario The Maker for O'Miami! "
+    "The Banana Poem Phone was created by Mario The Maker for O, Miami! "
     "Simply dial any 7-digit number, or 10-digit with area code, to hear a randomly selected poem. "
     "You never know what you'll get! "
     "Pro tip: try dialing some famous numbers for fun Easter eggs hidden throughout the experience. "

@@ -2,7 +2,7 @@
 
 The Poetry Phone worked. Pick up, dial, hear a poem, hang up. Beautiful.
 
-Then I remembered where it was going: the O'Miami Poetry Festival. An outdoor event in Miami. Where children exist.
+Then I remembered where it was going: the O, Miami Poetry Festival. An outdoor event in Miami. Where children exist.
 
 Kids don't use phones the way adults do. Kids pick up the handset and slam it down. They mash every button at once. They dial half a number, get distracted by a dog, and walk away with the handset dangling off the table. They hold down the 5 key for thirty seconds to see what happens.
 
@@ -185,7 +185,7 @@ Add a new Easter egg to the phonebook, forget to copy the audio file, and your C
 
 5. **Easter eggs make art installations memorable.** Nobody remembers "I dialed a number and heard a poem." Everyone remembers "I dialed 777-FILM and got a fake Moviefone about a poet stuck in Chicago."
 
-The Banana Poem Phone is ready for O'Miami. Pick up the handset. Dial a number. Any number. You'll hear a poem. And if you dial the right number, you might hear something you didn't expect.
+The Banana Poem Phone is ready for O, Miami. Pick up the handset. Dial a number. Any number. You'll hear a poem. And if you dial the right number, you might hear something you didn't expect.
 
 ---
 

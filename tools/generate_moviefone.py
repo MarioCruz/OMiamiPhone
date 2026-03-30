@@ -40,7 +40,7 @@ SCRIPT = (
     "hang up and dial any seven-digit number. "
     "Why are you still listening to this? "
     "Go hear a poem. "
-    "Thank you for calling Poemafone — a service of O'Miami. "
+    "Thank you for calling Poemafone — a service of O, Miami. "
     "No refunds. No concessions. Unlimited poems."
 )
 

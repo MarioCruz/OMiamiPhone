@@ -33,7 +33,7 @@ SCRIPT = (
     "And somewhere in Miami, a banana phone is ringing. "
     "If you are hearing this, you are exactly on time. "
     "You are never early, never late, for a poem. "
-    "This has been a public service announcement from the Banana Poem Phone and O'Miami. "
+    "This has been a public service announcement from the Banana Poem Phone and O, Miami. "
     "Please set your watches to wonder."
 )
 

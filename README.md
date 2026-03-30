@@ -1,17 +1,21 @@
 # PhoneHack — Banana Poem Phone
 
-An interactive art installation for the [O,Miami Poetry Festival](https://www.omiami.org/). Dial a number on a real phone keypad, hear ringing, then listen to a poem through the earpiece. Every number leads to a poem — but some numbers hide surprises.
+![Banana Poem Phone](images/banana-phone-top.jpeg)
+
+An interactive art installation for the [O, Miami Poetry Festival](https://www.omiami.org/). Dial a number on a real phone keypad, hear ringing, then listen to a poem through the earpiece. Every number leads to a poem — but some numbers hide surprises.
 
 Created by **Mario The Maker**.
 
 Built with a Raspberry Pi Pico, DFPlayer Mini MP3 module, and a salvaged phone handset.
+
+![Banana Poem Phone — angle view](images/banana-phone-angle.jpeg)
 
 ## How It Works
 
 1. Lift the handset — hear a dial tone
 2. Dial a 7-digit number — hear DTMF touch tones
 3. If the number is in the phonebook — hear ringing, then the mapped poem plays
-4. If not — hear ringing, then a random O'Miami poem plays
+4. If not — hear ringing, then a random O, Miami poem plays
 5. Hang up at any time to reset
 
 ## Easter Eggs
@@ -25,7 +29,7 @@ Built with a Raspberry Pi Pico, DFPlayer Mini MP3 module, and a salvaged phone h
 | **324-8811** | "Poetry Time" — Miami's old time-of-day number, poetry edition |
 | **777-3456** | "Poemafone" — Moviefone parody feat. P. Scott Cunningham in *A Poet Stuck in Chicago* |
 | **411** | Directory assistance — explains the phone and hints at Easter eggs |
-| **305** | O'Miami shoutout |
+| **305** | O, Miami shoutout |
 | **0** | Operator |
 | **211** | Community services — "In this city of sun and salt..." |
 | **511** | Traffic — "Every road in Miami leads to the ocean..." |
@@ -35,7 +39,7 @@ Built with a Raspberry Pi Pico, DFPlayer Mini MP3 module, and a salvaged phone h
 | **911** | Emergency redirect — "This is not a real phone" |
 | **311** | City services |
 
-All other numbers play a random poem from the 28-poem O'Miami collection.
+All other numbers play a random poem from the 28-poem O, Miami collection.
 
 ## Hardware
 
@@ -167,7 +171,7 @@ stateDiagram-v2
 - **Special codes** (3-digit) trigger after 1 second pause:
   - `0` — Operator
   - `211` — Community services
-  - `305` — O'Miami!
+  - `305` — O, Miami!
   - `311` — City services
   - `411` — Directory assistance
   - `511` — Traffic/road conditions
@@ -211,7 +215,7 @@ sd_card/
 │   ├── 004_poetry_time.mp3       ← 324-8811
 │   └── 005_moviefone.mp3         ← 777-3456
 │
-└── 03/                           ← Random O'Miami poems (28 files)
+└── 03/                           ← Random O, Miami poems (28 files)
     ├── 001_Ana_Martinez.mp3
     ├── 002_Samantha_Desjardins.mp3
     ├── ...
@@ -224,7 +228,7 @@ After copying to SD card on macOS: `dot_clean /Volumes/<SDCard>`
 
 ## Audio Generation
 
-All voice messages are generated with **ElevenLabs TTS** (Sarah voice, `eleven_multilingual_v2` model). The O'Miami poems use multiple voices matched by poem type and poet gender.
+All voice messages are generated with **ElevenLabs TTS** (Sarah voice, `eleven_multilingual_v2` model). The O, Miami poems use multiple voices matched by poem type and poet gender.
 
 Dial tones and DTMF are synthesized with `tools/generate_tones.py`.
 
@@ -291,7 +295,7 @@ Built to survive kids at an art festival:
 | `dfplayer.py` | `:dfplayer.py` | DFPlayer Mini library |
 | `phonebook.json` | `:phonebook.json` | Phone number → poem mappings |
 | `sd_card/` | SD card | Full SD card image (tracked in git as backup) |
-| `OmiamiPoems/` | No | Source O'Miami poem MP3s (29 poems + HTML player) |
+| `OmiamiPoems/` | No | Source O, Miami poem MP3s (29 poems + HTML player) |
 | `tools/` | No | Desktop scripts (tone generators, 411 generator, keypad discovery) |
 | `hardware_test/` | No | Hardware validation (DFPlayer, hook switch, BUSY pin) |
 | `test/` | No | 145 pytest tests with MicroPython mock framework |
