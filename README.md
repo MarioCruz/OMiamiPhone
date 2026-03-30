@@ -1,6 +1,6 @@
 # PhoneHack — Banana Poem Phone
 
-An interactive art installation for the [O'Miami Poetry Festival](https://www.omiami.org/). Dial a number on a real phone keypad, hear ringing, then listen to a poem through the earpiece. Every number leads to a poem — but some numbers hide surprises.
+An interactive art installation for the [O,Miami Poetry Festival](https://www.omiami.org/). Dial a number on a real phone keypad, hear ringing, then listen to a poem through the earpiece. Every number leads to a poem — but some numbers hide surprises.
 
 Created by **Mario The Maker**.
 
